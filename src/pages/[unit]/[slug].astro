@@ -1,0 +1,350 @@
+---
+import Header from '../../components/Header.astro';
+import '../../styles/global.css';
+import { units } from '../../data/catalog.js';
+import { topicContent } from '../../data/topics.js';
+
+export function getStaticPaths() {
+  return units.flatMap((unit) =>
+    unit.cards.map((card) => ({
+      params: { unit: unit.slug, slug: card.slug },
+      props: { unit, card },
+    }))
+  );
+}
+
+const { unit, card } = Astro.props;
+const content = topicContent[card.slug];
+const otherTopics = unit.cards.filter((item) => item.slug !== card.slug);
+
+const banners = {
+  ochre: 'border-[#e7dcc6] bg-[#fdf9f0]',
+  emerald: 'border-[#d3e5d9] bg-[#f3f9f5]',
+  sky: 'border-[#d5e4ee] bg-[#f4f9fc]',
+};
+
+const dots = {
+  ochre: 'bg-ochre',
+  emerald: 'bg-emerald-600',
+  sky: 'bg-sky-600',
+};
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={card.description} />
+    <title>{card.title} | Economía App</title>
+  </head>
+  <body class="min-h-screen bg-[#fbfcfa] text-slate-900 antialiased">
+    <Header />
+
+    <main class="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+      <nav aria-label="Migas de pan" class="text-sm text-slate-500">
+        <a
+          href="/#catalogo"
+          class="rounded transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+        >
+          Catálogo
+        </a>
+        <span class="mx-2 text-slate-300" aria-hidden="true">/</span>
+        <span class="text-slate-700">{unit.label}</span>
+      </nav>
+
+      <header
+        class:list={[
+          'relative mt-6 overflow-hidden rounded-2xl border',
+          banners[card.accent],
+        ]}
+      >
+        <div
+          class="pointer-events-none absolute inset-0 bg-grid opacity-60"
+          aria-hidden="true"
+        >
+        </div>
+
+        <div
+          class:list={[
+            'relative px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14',
+            content && 'grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center',
+          ]}
+        >
+          <div>
+            <h1
+              class="text-balance font-display text-4xl leading-[1.05] tracking-[-0.02em] text-ink sm:text-5xl lg:text-6xl"
+            >
+              {card.title}
+            </h1>
+
+            <p class="mt-5 max-w-xl text-lg leading-8 text-slate-700">
+              {content?.lead ?? card.description}
+            </p>
+          </div>
+
+          {content && (
+            <figure class="mx-auto w-full max-w-sm lg:max-w-none">
+              <svg
+                viewBox="0 0 360 230"
+                class="h-auto w-full"
+                role="img"
+                aria-label="El monto crece en línea recta a medida que pasa el tiempo"
+              >
+                <path
+                  d="M52 192 L332 48 L332 192 Z"
+                  fill="#b7791f"
+                  fill-opacity="0.08"
+                />
+
+                <g stroke="#10231c" stroke-opacity="0.07">
+                  <line x1="52" y1="64" x2="332" y2="64" />
+                  <line x1="52" y1="96" x2="332" y2="96" />
+                  <line x1="52" y1="128" x2="332" y2="128" />
+                  <line x1="52" y1="160" x2="332" y2="160" />
+                  <line x1="122" y1="32" x2="122" y2="192" />
+                  <line x1="192" y1="32" x2="192" y2="192" />
+                  <line x1="262" y1="32" x2="262" y2="192" />
+                </g>
+
+                <line
+                  x1="52"
+                  y1="32"
+                  x2="52"
+                  y2="192"
+                  stroke="#cbd5e1"
+                />
+                <line
+                  x1="52"
+                  y1="192"
+                  x2="332"
+                  y2="192"
+                  stroke="#cbd5e1"
+                />
+                <line
+                  x1="332"
+                  y1="48"
+                  x2="332"
+                  y2="192"
+                  stroke="#b7791f"
+                  stroke-opacity="0.3"
+                  stroke-dasharray="3 4"
+                />
+
+                <line
+                  x1="52"
+                  y1="192"
+                  x2="332"
+                  y2="48"
+                  stroke="#b7791f"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+
+                <g fill="#b7791f">
+                  <circle cx="52" cy="192" r="4" />
+                  <circle cx="108" cy="163.2" r="4" />
+                  <circle cx="164" cy="134.4" r="4" />
+                  <circle cx="220" cy="105.6" r="4" />
+                  <circle cx="276" cy="76.8" r="4" />
+                  <circle cx="332" cy="48" r="4" />
+                </g>
+
+                <g fill="#10231c" font-size="13">
+                  <text x="42" y="196" text-anchor="end">C</text>
+                  <text x="42" y="52" text-anchor="end">C + I</text>
+                </g>
+                <text
+                  x="332"
+                  y="218"
+                  text-anchor="end"
+                  font-size="12"
+                  fill="#475569"
+                >
+                  Tiempo
+                </text>
+              </svg>
+            </figure>
+          )}
+        </div>
+      </header>
+
+      <div class="mt-14 grid gap-12 lg:grid-cols-3">
+        <div class="lg:col-span-2">
+          {content ? (
+            <article>
+              <section aria-labelledby="que-es">
+                <h2
+                  id="que-es"
+                  class="font-display text-3xl tracking-[-0.01em] text-ink"
+                >
+                  ¿Qué es el interés simple?
+                </h2>
+
+                <div
+                  class="mt-5 max-w-[68ch] space-y-5 text-[17px] leading-8 text-slate-600"
+                >
+                  {content.whatIs.map((paragraph) => (
+                    <p>{paragraph}</p>
+                  ))}
+                </div>
+
+                <p
+                  class="mt-7 max-w-[68ch] border-l-2 border-ochre pl-4 text-[17px] leading-8 text-ink"
+                >
+                  {content.example}
+                </p>
+              </section>
+
+              <section aria-labelledby="formula" class="mt-14">
+                <div
+                  class="relative overflow-hidden rounded-2xl border border-[#e7dcc6] bg-[#fdf9f0] px-6 py-9 sm:px-10 sm:py-10"
+                >
+                  <div
+                    class="pointer-events-none absolute inset-0 bg-grid opacity-60"
+                    aria-hidden="true"
+                  >
+                  </div>
+
+                  <div class="relative">
+                    <h2
+                      id="formula"
+                      class="flex items-center gap-2.5 text-sm font-semibold text-slate-700"
+                    >
+                      <span
+                        class="h-px w-6 shrink-0 bg-ochre"
+                        aria-hidden="true"
+                      />
+                      Fórmula del interés simple
+                    </h2>
+
+                    <p
+                      class="mt-6 font-display text-4xl italic tracking-[-0.02em] text-ink sm:text-5xl"
+                    >
+                      {content.formula.expression}
+                    </p>
+
+                    <p class="mt-6 max-w-md text-sm leading-6 text-slate-600">
+                      {content.formula.note}
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section aria-labelledby="simbolos" class="mt-14">
+                <h2
+                  id="simbolos"
+                  class="font-display text-3xl tracking-[-0.01em] text-ink"
+                >
+                  Qué significa cada símbolo
+                </h2>
+
+                <dl
+                  class="mt-7 grid gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 sm:grid-cols-2"
+                >
+                  {content.symbols.map((item) => (
+                    <div class="bg-white p-6">
+                      <dt class="flex items-baseline gap-2.5">
+                        <span
+                          class="font-display text-3xl italic leading-none text-ochre"
+                        >
+                          {item.symbol}
+                        </span>
+                        <span class="text-sm font-semibold text-ink">
+                          {item.name}
+                        </span>
+                      </dt>
+                      <dd class="mt-3 text-sm leading-6 text-slate-600">
+                        {item.description}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            </article>
+          ) : (
+            <section
+              class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-16 text-center sm:px-10"
+            >
+              <p class="font-display text-2xl text-ink">
+                Contenido en preparación
+              </p>
+              <p class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600">
+                Estamos escribiendo este tema. Mientras tanto, podés volver al
+                catálogo y seguir con otro.
+              </p>
+              <a
+                href="/#catalogo"
+                class="mt-7 inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-4 w-4"
+                  aria-hidden="true"
+                >
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Volver al catálogo
+              </a>
+            </section>
+          )}
+        </div>
+
+        <aside
+          aria-labelledby="otros-temas"
+          class="lg:sticky lg:top-24 lg:col-span-1 lg:self-start"
+        >
+          <h2 id="otros-temas" class="text-sm font-semibold text-slate-900">
+            Otros temas de la unidad
+          </h2>
+
+          {otherTopics.length > 0 ? (
+            <ul class="mt-4 space-y-1">
+              {otherTopics.map((topic) => (
+                <li>
+                  <a
+                    href={`/${unit.slug}/${topic.slug}`}
+                    class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-600 transition hover:bg-white hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  >
+                    <span
+                      class:list={[
+                        'h-1.5 w-1.5 shrink-0 rounded-full',
+                        dots[topic.accent],
+                      ]}
+                      aria-hidden="true"
+                    />
+                    <span class="flex-1">{topic.title}</span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.75"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-4 w-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500"
+                      aria-hidden="true"
+                    >
+                      <path d="m9 6 6 6-6 6" />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="mt-4 text-sm text-slate-500">
+              Es el único tema de esta unidad por ahora.
+            </p>
+          )}
+        </aside>
+      </div>
+    </main>
+  </body>
+</html>

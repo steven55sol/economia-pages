@@ -1,0 +1,164 @@
+---
+---
+
+<section class="relative isolate overflow-hidden border-b border-slate-200 bg-paper">
+  <div class="pointer-events-none absolute inset-0 bg-grid" aria-hidden="true"></div>
+
+  <div
+    class="relative mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:py-20"
+  >
+    <!-- Texto -->
+    <div class="min-w-0">
+      <h1
+        class="font-display text-4xl leading-[1.05] tracking-[-0.02em] text-ink sm:text-5xl lg:text-6xl"
+      >
+        El mismo capital,
+        <span class="block">dos resultados.</span>
+      </h1>
+
+      <p class="mt-5 max-w-md text-base leading-7 text-slate-600">
+        Interés simple y compuesto con un ejemplo concreto, las fórmulas y
+        ejercicios para ponerlo en práctica.
+      </p>
+    </div>
+
+    <!-- Visual -->
+    <figure class="mx-auto w-full min-w-0 max-w-xl lg:mx-0 lg:max-w-none">
+      <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+        <p class="font-display text-lg text-ink">$1.000 al 10% anual</p>
+
+        <div class="flex items-center gap-4 text-xs text-slate-600">
+          <span class="flex items-center gap-1.5">
+            <span class="h-[3px] w-5 rounded-full bg-ochre" aria-hidden="true"></span>
+            Simple
+          </span>
+          <span class="flex items-center gap-1.5">
+            <span class="h-[3px] w-5 rounded-full bg-emerald-600" aria-hidden="true"></span>
+            Compuesto
+          </span>
+        </div>
+      </div>
+
+      <svg
+        viewBox="0 0 600 440"
+        class="mt-4 w-full"
+        role="img"
+        aria-labelledby="interest-chart-title interest-chart-desc"
+      >
+        <title id="interest-chart-title">Interés simple e interés compuesto</title>
+        <desc id="interest-chart-desc">
+          Con un capital inicial de 1.000 al 10% anual, el interés simple llega a
+          2.000 en 10 años, mientras que el interés compuesto llega a 2.594.
+        </desc>
+
+        <defs>
+          <linearGradient id="interest-area" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#059669" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="#059669" stop-opacity="0.03" />
+          </linearGradient>
+        </defs>
+
+        <!-- Hoja de gráfico con sombra desplazada -->
+        <rect x="16" y="24" width="572" height="392" fill="#dbe7dd" />
+        <rect x="6" y="14" width="572" height="392" fill="#fbfcfa" stroke="#c9d6cb" />
+
+        <!-- Grilla -->
+        <g stroke="#e3ebe4" stroke-width="1">
+          <line x1="70" y1="88.1" x2="520" y2="88.1" />
+          <line x1="70" y1="178.8" x2="520" y2="178.8" />
+          <line x1="70" y1="269.4" x2="520" y2="269.4" />
+          <line x1="160" y1="70" x2="160" y2="360" />
+          <line x1="250" y1="70" x2="250" y2="360" />
+          <line x1="340" y1="70" x2="340" y2="360" />
+          <line x1="430" y1="70" x2="430" y2="360" />
+        </g>
+
+        <!-- Ejes -->
+        <g stroke="#94a3b8" stroke-width="1">
+          <line x1="70" y1="70" x2="70" y2="360" />
+          <line x1="70" y1="360" x2="520" y2="360" />
+        </g>
+
+        <!-- Área entre ambas curvas -->
+        <path
+          d="M70 360 L115 341.9 L160 321.9 L205 300 L250 275.9 L295 249.3 L340 220.2 L385 188 L430 152.7 L475 113.9 L520 71.1 L520 178.8 L70 360 Z"
+          fill="url(#interest-area)"></path>
+
+        <!-- Interés simple -->
+        <line
+          x1="70"
+          y1="360"
+          x2="520"
+          y2="178.8"
+          stroke="#b7791f"
+          stroke-width="2.5"
+          stroke-linecap="round"></line>
+
+        <!-- Interés compuesto -->
+        <path
+          d="M70 360 L115 341.9 L160 321.9 L205 300 L250 275.9 L295 249.3 L340 220.2 L385 188 L430 152.7 L475 113.9 L520 71.1"
+          fill="none"
+          stroke="#059669"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+
+        <!-- Puntos de inicio y fin -->
+        <circle cx="70" cy="360" r="4.5" fill="#10231c" stroke="#fbfcfa" stroke-width="2" />
+        <circle cx="520" cy="178.8" r="4.5" fill="#b7791f" stroke="#fbfcfa" stroke-width="2" />
+        <circle cx="520" cy="71.1" r="4.5" fill="#059669" stroke="#fbfcfa" stroke-width="2" />
+
+        <!-- Valor final del interés compuesto -->
+        <text
+          x="510"
+          y="60"
+          text-anchor="end"
+          font-size="15"
+          font-weight="600"
+          fill="#047857"
+        >
+          $2.594
+        </text>
+
+        <!-- Etiquetas del eje Y -->
+        <g font-size="15" fill="#64748b" text-anchor="end">
+          <text x="60" y="364">$1.000</text>
+          <text x="60" y="274">$1.500</text>
+          <text x="60" y="183">$2.000</text>
+          <text x="60" y="92">$2.500</text>
+        </g>
+
+        <!-- Etiquetas del eje X -->
+        <g font-size="15" fill="#64748b" text-anchor="middle">
+          <text x="70" y="380">0</text>
+          <text x="160" y="380">2</text>
+          <text x="250" y="380">4</text>
+          <text x="340" y="380">6</text>
+          <text x="430" y="380">8</text>
+          <text x="520" y="380">10</text>
+        </g>
+
+        <!-- Títulos de los ejes -->
+        <text x="295" y="402" font-size="15" fill="#475569" text-anchor="middle">
+          Años
+        </text>
+        <text
+          x="26"
+          y="215"
+          font-size="15"
+          fill="#475569"
+          text-anchor="middle"
+          transform="rotate(-90 26 215)">Monto</text
+        >
+
+        <!-- Fórmula -->
+        <text x="94" y="108" font-size="13" fill="#64748b">
+          Fórmula del interés compuesto
+        </text>
+        <text x="94" y="132" font-family="Georgia, serif" font-size="20" fill="#10231c">
+          M = C · (1 + i)ⁿ
+        </text>
+      </svg>
+    </figure>
+  </div>
+</section>

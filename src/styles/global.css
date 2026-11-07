@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --color-paper: #f3f6f2;
+  --color-ink: #10231c;
+  --color-ochre: #b7791f;
+}
+
+@utility bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(16, 35, 28, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 35, 28, 0.055) 1px, transparent 1px);
+  background-size: 32px 32px;
+}

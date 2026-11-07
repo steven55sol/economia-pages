@@ -1,0 +1,29 @@
+---
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Catalog from '../components/Catalog.astro';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta
+			name="description"
+			content="Apuntes y ejercicios de economía y matemática financiera."
+		/>
+		<title>Economía App | Unidad 1</title>
+	</head>
+	<body class="min-h-screen bg-[#fbfcfa] text-slate-900 antialiased">
+		<Header />
+		<Hero />
+		<main>
+			<Catalog />
+		</main>
+	</body>
+</html>
