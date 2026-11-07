@@ -172,99 +172,163 @@ const dots = {
         </div>
       </header>
 
-      <div class="mt-14 grid gap-12 lg:grid-cols-3">
+      <div class="mt-12 grid gap-12 lg:grid-cols-3">
         <div class="lg:col-span-2">
           {content ? (
-            <article>
-              <section aria-labelledby="que-es">
-                <h2
-                  id="que-es"
-                  class="font-display text-3xl tracking-[-0.01em] text-ink"
+            <div data-topic-tabs>
+              <div
+                role="tablist"
+                aria-label="Contenido del tema"
+                class="flex gap-8 border-b border-slate-200"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  id="tab-concepto"
+                  aria-controls="panel-concepto"
+                  aria-selected="true"
+                  data-tab-button
+                  data-tab="concepto"
+                  class="-mb-px border-b-2 border-transparent pb-3 pt-1 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-selected:border-ochre aria-selected:text-ink"
                 >
-                  ¿Qué es el interés simple?
-                </h2>
-
-                <div
-                  class="mt-5 max-w-[68ch] space-y-5 text-[17px] leading-8 text-slate-600"
+                  Concepto
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  id="tab-ejercicios"
+                  aria-controls="panel-ejercicios"
+                  aria-selected="false"
+                  tabindex="-1"
+                  data-tab-button
+                  data-tab="ejercicios"
+                  class="-mb-px border-b-2 border-transparent pb-3 pt-1 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-selected:border-ochre aria-selected:text-ink"
                 >
-                  {content.whatIs.map((paragraph) => (
-                    <p>{paragraph}</p>
-                  ))}
-                </div>
+                  Ejercicios
+                </button>
+              </div>
 
-                <p
-                  class="mt-7 max-w-[68ch] border-l-2 border-ochre pl-4 text-[17px] leading-8 text-ink"
-                >
-                  {content.example}
-                </p>
-              </section>
-
-              <section aria-labelledby="formula" class="mt-14">
-                <div
-                  class="relative overflow-hidden rounded-2xl border border-[#e7dcc6] bg-[#fdf9f0] px-6 py-9 sm:px-10 sm:py-10"
-                >
-                  <div
-                    class="pointer-events-none absolute inset-0 bg-grid opacity-60"
-                    aria-hidden="true"
-                  >
-                  </div>
-
-                  <div class="relative">
+              <div
+                role="tabpanel"
+                id="panel-concepto"
+                aria-labelledby="tab-concepto"
+                data-tab-panel="concepto"
+                class="mt-10"
+              >
+                <article>
+                  <section aria-labelledby="que-es">
                     <h2
-                      id="formula"
-                      class="flex items-center gap-2.5 text-sm font-semibold text-slate-700"
+                      id="que-es"
+                      class="font-display text-3xl tracking-[-0.01em] text-ink"
                     >
-                      <span
-                        class="h-px w-6 shrink-0 bg-ochre"
-                        aria-hidden="true"
-                      />
-                      Fórmula del interés simple
+                      ¿Qué es el interés simple?
                     </h2>
 
-                    <p
-                      class="mt-6 font-display text-4xl italic tracking-[-0.02em] text-ink sm:text-5xl"
+                    <div
+                      class="mt-5 max-w-[68ch] space-y-5 text-[17px] leading-8 text-slate-600"
                     >
-                      {content.formula.expression}
-                    </p>
-
-                    <p class="mt-6 max-w-md text-sm leading-6 text-slate-600">
-                      {content.formula.note}
-                    </p>
-                  </div>
-                </div>
-              </section>
-
-              <section aria-labelledby="simbolos" class="mt-14">
-                <h2
-                  id="simbolos"
-                  class="font-display text-3xl tracking-[-0.01em] text-ink"
-                >
-                  Qué significa cada símbolo
-                </h2>
-
-                <dl
-                  class="mt-7 grid gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 sm:grid-cols-2"
-                >
-                  {content.symbols.map((item) => (
-                    <div class="bg-white p-6">
-                      <dt class="flex items-baseline gap-2.5">
-                        <span
-                          class="font-display text-3xl italic leading-none text-ochre"
-                        >
-                          {item.symbol}
-                        </span>
-                        <span class="text-sm font-semibold text-ink">
-                          {item.name}
-                        </span>
-                      </dt>
-                      <dd class="mt-3 text-sm leading-6 text-slate-600">
-                        {item.description}
-                      </dd>
+                      {content.whatIs.map((paragraph) => (
+                        <p>{paragraph}</p>
+                      ))}
                     </div>
-                  ))}
-                </dl>
-              </section>
-            </article>
+
+                    <p
+                      class="mt-7 max-w-[68ch] border-l-2 border-ochre pl-4 text-[17px] leading-8 text-ink"
+                    >
+                      {content.example}
+                    </p>
+                  </section>
+
+                  <section aria-labelledby="formula" class="mt-14">
+                    <div
+                      class="relative overflow-hidden rounded-2xl border border-[#e7dcc6] bg-[#fdf9f0] px-6 py-9 sm:px-10 sm:py-10"
+                    >
+                      <div
+                        class="pointer-events-none absolute inset-0 bg-grid opacity-60"
+                        aria-hidden="true"
+                      >
+                      </div>
+
+                      <div class="relative">
+                        <h2
+                          id="formula"
+                          class="flex items-center gap-2.5 text-sm font-semibold text-slate-700"
+                        >
+                          <span
+                            class="h-px w-6 shrink-0 bg-ochre"
+                            aria-hidden="true"
+                          />
+                          Fórmula del interés simple
+                        </h2>
+
+                        <p
+                          class="mt-6 font-display text-4xl italic tracking-[-0.02em] text-ink sm:text-5xl"
+                        >
+                          {content.formula.expression}
+                        </p>
+
+                        <p class="mt-6 max-w-md text-sm leading-6 text-slate-600">
+                          {content.formula.note}
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section aria-labelledby="simbolos" class="mt-14">
+                    <h2
+                      id="simbolos"
+                      class="font-display text-3xl tracking-[-0.01em] text-ink"
+                    >
+                      Qué significa cada símbolo
+                    </h2>
+
+                    <dl
+                      class="mt-7 grid gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 sm:grid-cols-2"
+                    >
+                      {content.symbols.map((item) => (
+                        <div class="bg-white p-6">
+                          <dt class="flex items-baseline gap-2.5">
+                            <span
+                              class="font-display text-3xl italic leading-none text-ochre"
+                            >
+                              {item.symbol}
+                            </span>
+                            <span class="text-sm font-semibold text-ink">
+                              {item.name}
+                            </span>
+                          </dt>
+                          <dd class="mt-3 text-sm leading-6 text-slate-600">
+                            {item.description}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </section>
+                </article>
+              </div>
+
+              <div
+                role="tabpanel"
+                id="panel-ejercicios"
+                aria-labelledby="tab-ejercicios"
+                data-tab-panel="ejercicios"
+                hidden
+                class="mt-10"
+              >
+                <section
+                  class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-16 text-center"
+                >
+                  <p class="font-display text-2xl text-ink">
+                    Ejercicios en preparación
+                  </p>
+                  <p
+                    class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"
+                  >
+                    Todavía no hay ejercicios para este tema.
+                  </p>
+                </section>
+              </div>
+            </div>
           ) : (
             <section
               class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-16 text-center sm:px-10"
@@ -346,5 +410,50 @@ const dots = {
         </aside>
       </div>
     </main>
+
+    <script>
+      const topicTabs = document.querySelector('[data-topic-tabs]');
+
+      if (topicTabs) {
+        const tabs = [...topicTabs.querySelectorAll('[data-tab-button]')];
+        const panels = [...topicTabs.querySelectorAll('[data-tab-panel]')];
+
+        const selectTab = (name, focus = false) => {
+          tabs.forEach((tab) => {
+            const selected = tab.dataset.tab === name;
+            tab.setAttribute('aria-selected', String(selected));
+            tab.tabIndex = selected ? 0 : -1;
+
+            if (selected && focus) tab.focus();
+          });
+
+          panels.forEach((panel) => {
+            panel.hidden = panel.dataset.tabPanel !== name;
+          });
+        };
+
+        tabs.forEach((tab, index) => {
+          tab.addEventListener('click', () => selectTab(tab.dataset.tab));
+
+          tab.addEventListener('keydown', (event) => {
+            let nextIndex = null;
+
+            if (event.key === 'ArrowRight') {
+              nextIndex = (index + 1) % tabs.length;
+            }
+            if (event.key === 'ArrowLeft') {
+              nextIndex = (index - 1 + tabs.length) % tabs.length;
+            }
+            if (event.key === 'Home') nextIndex = 0;
+            if (event.key === 'End') nextIndex = tabs.length - 1;
+
+            if (nextIndex !== null) {
+              event.preventDefault();
+              selectTab(tabs[nextIndex].dataset.tab, true);
+            }
+          });
+        });
+      }
+    </script>
   </body>
 </html>
