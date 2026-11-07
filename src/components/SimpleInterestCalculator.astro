@@ -649,12 +649,18 @@ const fieldValue = (value, options) => {
     }
 
     function getFormValues() {
+      const readField = (fieldName) => {
+        const field = fields[fieldName];
+        const precise = field?.dataset.preciseValue;
+        return precise ? precise : field.value;
+      };
+
       return {
         target: state.target,
-        I: fields.I.value,
-        C: fields.C.value,
-        i: fields.i.value,
-        n: fields.n.value,
+        I: readField('I'),
+        C: readField('C'),
+        i: readField('i'),
+        n: readField('n'),
         timeUnit: timeUnitSelect.value,
         rateType: rateTypeSelect.value,
         yearDays: getYearDays(),
@@ -677,6 +683,10 @@ const fieldValue = (value, options) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     };
+    const rateInputOptions = {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    };
 
     function setFieldValue(fieldName, value) {
       const field = fields[fieldName];
@@ -684,16 +694,26 @@ const fieldValue = (value, options) => {
 
       if (value === null || value === undefined || value === '') {
         field.value = '';
+        delete field.dataset.preciseValue;
         return;
       }
 
       const parsed = typeof value === 'number' ? value : parseNumber(value);
-      field.value = Number.isFinite(parsed)
-        ? formatInputNumber(
-            parsed,
-            moneyFields.has(fieldName) ? moneyInputOptions : undefined
-          )
-        : String(value);
+      if (Number.isFinite(parsed)) {
+        field.value = formatInputNumber(
+          parsed,
+          moneyFields.has(fieldName)
+            ? moneyInputOptions
+            : fieldName === 'i'
+              ? rateInputOptions
+              : undefined
+        );
+        field.dataset.preciseValue = String(parsed);
+        return;
+      }
+
+      field.value = String(value);
+      delete field.dataset.preciseValue;
     }
 
     function setFields(values) {
@@ -818,7 +838,7 @@ const fieldValue = (value, options) => {
 
       if (Number.isFinite(i) && i > 0) {
         const annual = toAnnualRate(i, rateType, yearDays);
-        conversionRate.textContent = `${formatPercent(i, 4)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
+        conversionRate.textContent = `${formatPercent(i, 2)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
       } else {
         conversionRate.textContent = 'Ingresá una tasa para ver la conversión.';
       }
@@ -862,12 +882,12 @@ const fieldValue = (value, options) => {
         ['Interés', formatMoney(result.summary.interest)],
         ['Capital inicial', formatMoney(result.summary.capital)],
         ['Monto total', formatMoney(result.summary.total)],
-        ['Tasa', `${formatPercent(result.values.i, 4)} ${rateLabel}`],
+        ['Tasa', `${formatPercent(result.values.i, 2)} ${rateLabel}`],
         ['Tiempo', `${formatNumber(result.values.n, 4)} ${timeLabel}`],
         ['Base de días', `${result.yearDays} días`],
         ['Tiempo en años', `${formatNumber(result.conversions.nYears, 4)} años`],
         ['Tiempo en días', `${formatNumber(result.conversions.nDays, 2)} días`],
-        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, 4)],
+        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, 2)],
         ['Tasa anual decimal', formatNumber(result.conversions.iAnnual, 6)],
       ];
 
@@ -1233,6 +1253,7 @@ const fieldValue = (value, options) => {
     form.addEventListener('input', (event) => {
       const fieldName = event.target.dataset.field;
       if (!fieldName) return;
+      delete event.target.dataset.preciseValue;
       clearFieldError(fieldName);
       updateConversions();
       showStale();

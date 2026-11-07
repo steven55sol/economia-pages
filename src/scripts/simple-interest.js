@@ -183,7 +183,7 @@ function buildFormula({
     return {
       expression: 'i = I / (C × n)',
       substitution: `i anual = ${formatMoney(I)} / (${formatMoney(C)} × ${nYearsText}) = ${iAnnualText}`,
-      resultLine: `i ${rateLabel} = ${formatPercent(iPercent, 4)}`,
+      resultLine: `i ${rateLabel} = ${formatPercent(iPercent, 2)}`,
     };
   }
 
@@ -222,7 +222,7 @@ function buildSteps({
   const timeLabel = TIME_UNITS[timeUnit].label;
   const steps = [];
 
-  const rateLine = `Tasa: ${formatPercent(iPercent, 4)} ${rateLabel} = ${formatNumber(iAnnual, 8)} anual.`;
+  const rateLine = `Tasa: ${formatPercent(iPercent, 2)} ${rateLabel} = ${formatNumber(iAnnual, 8)} anual.`;
   let timeLine = `Tiempo: ${formatNumber(nValue, 4)} ${timeLabel} = ${formatNumber(nYears, 8)} años = ${formatNumber(nDays, 4)} días (base ${yearDays}).`;
   if (yearDays === 360) {
     timeLine += ` Equivalencia calendario: ${formatNumber(nCalendarDays, 2)} días.`;
@@ -232,7 +232,7 @@ function buildSteps({
     steps.push(timeLine);
     steps.push(`Fórmula: ${formula.expression}.`);
     steps.push(`Sustitución: ${formula.substitution}.`);
-    steps.push(`Conversión: ${formatNumber(iAnnual, 8)} anual = ${formatPercent(iPercent, 4)} ${rateLabel}.`);
+    steps.push(`Conversión: ${formatNumber(iAnnual, 8)} anual = ${formatPercent(iPercent, 2)} ${rateLabel}.`);
   } else if (target === 'n') {
     steps.push(rateLine);
     steps.push(`Fórmula: ${formula.expression}.`);
@@ -320,7 +320,7 @@ export function solveExercise(input) {
     target === 'i' ? '%' : target === 'n' ? TIME_UNITS[timeUnit].label : 'money';
   const resultFormatted =
     target === 'i'
-      ? formatPercent(iPercent, 4)
+      ? formatPercent(iPercent, 2)
       : target === 'n'
         ? `${formatNumber(nValue, 4)} ${TIME_UNITS[timeUnit].label}`
         : formatMoney(resultValue);
