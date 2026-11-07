@@ -1,0 +1,1281 @@
+---
+import {
+  simpleInterestExercises,
+} from '../data/exercises.js';
+import {
+  formatInputNumber,
+  parseNumber,
+} from '../scripts/simple-interest.js';
+
+const exercises = simpleInterestExercises;
+const initialExercise = exercises[0];
+const initialTarget = initialExercise?.target ?? 'C';
+const initialYearDays = initialExercise?.yearDays ?? 360;
+const initialValues = initialExercise?.data ?? {};
+
+const inputBoxClass =
+  'mt-2 flex items-center overflow-hidden rounded-lg border border-slate-300 bg-white transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20 data-[invalid=true]:border-red-400 data-[invalid=true]:ring-2 data-[invalid=true]:ring-red-100 data-[target=true]:border-ochre data-[target=true]:bg-[#fdf9f0]';
+const inputClass =
+  'w-full border-0 bg-transparent px-3 py-2.5 text-sm tabular-nums text-ink outline-none placeholder:text-slate-400';
+const selectClass =
+  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-ink outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20';
+const fieldLabelClass = 'text-sm font-medium text-slate-700';
+const targetButtonClass =
+  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white';
+const chartTabClass =
+  'rounded-md px-2 py-1.5 text-xs font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-pressed:bg-white aria-pressed:text-ink aria-pressed:shadow-sm sm:px-3';
+const secondaryButtonClass =
+  'rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2';
+
+const moneyInputOptions = {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+};
+
+const fieldValue = (value, options) => {
+  const parsed = parseNumber(value);
+  return Number.isFinite(parsed) ? formatInputNumber(parsed, options) : '';
+};
+---
+
+<section data-simple-interest-calculator class="text-slate-900">
+  <header
+    class="flex flex-col gap-5 border-b border-slate-200 pb-8 sm:flex-row sm:items-end sm:justify-between"
+  >
+    <div>
+      <p class="flex items-center gap-2.5 text-sm font-semibold text-slate-700">
+        <span class="h-px w-6 bg-ochre" aria-hidden="true"></span>
+        Ejercicios
+      </p>
+      <h2
+        data-exercise-heading
+        class="mt-3 font-display text-3xl tracking-[-0.01em] text-ink sm:text-4xl"
+      >
+        {initialExercise?.title ?? 'Ejercicios'}
+      </h2>
+    </div>
+
+    <label class="flex w-full flex-col gap-2 text-sm text-slate-600 sm:w-auto sm:flex-row sm:items-center sm:gap-3">
+      <span class="whitespace-nowrap">Cambiar ejercicio</span>
+      <span class="relative block w-full sm:w-auto">
+        <select
+          data-exercise-select
+          class="w-full appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pr-9 pl-3 text-sm font-medium text-ink outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 sm:min-w-44"
+        >
+          {exercises.map((exercise) => (
+            <option value={exercise.id} selected={exercise.id === initialExercise?.id}>
+              {exercise.title}
+            </option>
+          ))}
+        </select>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </span>
+    </label>
+  </header>
+
+  <div
+    class="mt-6 rounded-2xl border border-[#e7dcc6] bg-[#fdf9f0] px-6 py-6 sm:px-8"
+  >
+    <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+      Enunciado
+    </p>
+    <p
+      data-exercise-statement
+      class="mt-3 max-w-4xl font-display text-xl leading-8 text-ink sm:text-2xl sm:leading-9"
+    >
+      {initialExercise?.statement}
+    </p>
+  </div>
+
+  <div class="mt-8 grid items-start gap-8 lg:grid-cols-2">
+    <div class="rounded-2xl border border-slate-200 bg-white">
+      <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
+        <h3 class="font-display text-2xl text-ink">Calculadora</h3>
+        <p class="mt-1 text-sm text-slate-500">
+          Completá los datos y presioná Calcular.
+        </p>
+      </div>
+
+      <form data-calculator-form class="px-5 py-6 sm:px-6" novalidate>
+        <fieldset>
+          <legend class="text-sm font-semibold text-slate-900">
+            ¿Qué querés calcular?
+          </legend>
+          <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label="Variable a calcular">
+            <button
+              type="button"
+              data-target-option="I"
+              aria-pressed={initialTarget === 'I' ? 'true' : 'false'}
+              class={targetButtonClass}
+            >
+              Interés
+            </button>
+            <button
+              type="button"
+              data-target-option="C"
+              aria-pressed={initialTarget === 'C' ? 'true' : 'false'}
+              class={targetButtonClass}
+            >
+              Capital
+            </button>
+            <button
+              type="button"
+              data-target-option="i"
+              aria-pressed={initialTarget === 'i' ? 'true' : 'false'}
+              class={targetButtonClass}
+            >
+              Tasa
+            </button>
+            <button
+              type="button"
+              data-target-option="n"
+              aria-pressed={initialTarget === 'n' ? 'true' : 'false'}
+              class={targetButtonClass}
+            >
+              Tiempo
+            </button>
+          </div>
+        </fieldset>
+
+        <p class="mt-3 text-xs leading-5 text-slate-500">
+          El campo marcado con «se calcula» se actualiza al presionar Calcular.
+          Todos los campos se pueden editar.
+        </p>
+
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <label for="si-I" class={fieldLabelClass}>Interés (I)</label>
+              <span data-target-badge="I" hidden={initialTarget !== 'I'} class="text-xs font-semibold text-ochre">
+                Se calcula
+              </span>
+            </div>
+            <div
+              data-target-box="I"
+              data-target={initialTarget === 'I' ? 'true' : 'false'}
+              class={inputBoxClass}
+            >
+              <span class="pl-3 text-sm text-slate-500" aria-hidden="true">US$</span>
+              <input
+                id="si-I"
+                data-field="I"
+                value={fieldValue(initialValues.I, moneyInputOptions)}
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0"
+                aria-describedby="si-error-I"
+                class={inputClass}
+              />
+            </div>
+            <p id="si-error-I" data-error="I" class="mt-1.5 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <label for="si-C" class={fieldLabelClass}>Capital (C)</label>
+              <span data-target-badge="C" hidden={initialTarget !== 'C'} class="text-xs font-semibold text-ochre">
+                Se calcula
+              </span>
+            </div>
+            <div
+              data-target-box="C"
+              data-target={initialTarget === 'C' ? 'true' : 'false'}
+              class={inputBoxClass}
+            >
+              <span class="pl-3 text-sm text-slate-500" aria-hidden="true">US$</span>
+              <input
+                id="si-C"
+                data-field="C"
+                value={fieldValue(initialValues.C, moneyInputOptions)}
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0"
+                aria-describedby="si-error-C"
+                class={inputClass}
+              />
+            </div>
+            <p id="si-error-C" data-error="C" class="mt-1.5 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <label for="si-i" class={fieldLabelClass}>Tasa (i)</label>
+              <span data-target-badge="i" hidden={initialTarget !== 'i'} class="text-xs font-semibold text-ochre">
+                Se calcula
+              </span>
+            </div>
+            <div
+              data-target-box="i"
+              data-target={initialTarget === 'i' ? 'true' : 'false'}
+              class={inputBoxClass}
+            >
+              <input
+                id="si-i"
+                data-field="i"
+                value={fieldValue(initialValues.i)}
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0"
+                aria-describedby="si-error-i"
+                class={inputClass}
+              />
+              <span class="pr-3 text-sm text-slate-500" aria-hidden="true">%</span>
+            </div>
+            <p id="si-error-i" data-error="i" class="mt-1.5 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div>
+            <label for="si-rate-type" class={fieldLabelClass}>Tipo de tasa</label>
+            <select id="si-rate-type" data-rate-type class={`${selectClass} mt-2`}>
+              <option value="anual" selected={initialValues.rateType === 'anual'}>Anual</option>
+              <option value="mensual" selected={initialValues.rateType === 'mensual'}>Mensual</option>
+              <option value="semanal" selected={initialValues.rateType === 'semanal'}>Semanal</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <label for="si-n" class={fieldLabelClass}>Tiempo (n)</label>
+              <span data-target-badge="n" hidden={initialTarget !== 'n'} class="text-xs font-semibold text-ochre">
+                Se calcula
+              </span>
+            </div>
+            <div class="mt-2 flex gap-2">
+              <div
+                data-target-box="n"
+                data-target={initialTarget === 'n' ? 'true' : 'false'}
+                class={`${inputBoxClass} mt-0 flex-1`}
+              >
+                <input
+                  id="si-n"
+                  data-field="n"
+                  value={fieldValue(initialValues.n)}
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="0"
+                  aria-describedby="si-error-n"
+                  class={inputClass}
+                />
+              </div>
+              <select
+                data-time-unit
+                aria-label="Unidad de tiempo"
+                class="w-28 rounded-lg border border-slate-300 bg-white px-2 py-2.5 text-sm text-ink outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+              >
+                <option value="dias" selected={initialValues.timeUnit === 'dias'}>Días</option>
+                <option value="meses" selected={initialValues.timeUnit === 'meses'}>Meses</option>
+                <option value="anios" selected={initialValues.timeUnit === 'anios'}>Años</option>
+              </select>
+            </div>
+            <p id="si-error-n" data-error="n" class="mt-1.5 hidden text-xs text-red-600"></p>
+          </div>
+
+          <fieldset>
+            <legend class={fieldLabelClass}>Base de días</legend>
+            <div class="mt-2 grid grid-cols-2 gap-2">
+              <label class="cursor-pointer">
+                <input
+                  type="radio"
+                  name="si-year-days"
+                  value="360"
+                  data-year-days
+                  checked={initialYearDays === 360}
+                  class="peer sr-only"
+                />
+                <span class="block rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-slate-600 transition peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-600 peer-focus-visible:ring-offset-2">
+                  360 comercial
+                </span>
+              </label>
+              <label class="cursor-pointer">
+                <input
+                  type="radio"
+                  name="si-year-days"
+                  value="365"
+                  data-year-days
+                  checked={initialYearDays === 365}
+                  class="peer sr-only"
+                />
+                <span class="block rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-slate-600 transition peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-600 peer-focus-visible:ring-offset-2">
+                  365 calendario
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Conversión automática
+          </p>
+          <dl class="mt-3 space-y-2 text-sm">
+            <div class="flex gap-2">
+              <dt class="w-14 shrink-0 text-slate-500">Tiempo</dt>
+              <dd data-conversion-time class="text-slate-700">—</dd>
+            </div>
+            <div class="flex gap-2">
+              <dt class="w-14 shrink-0 text-slate-500">Tasa</dt>
+              <dd data-conversion-rate class="text-slate-700">—</dd>
+            </div>
+          </dl>
+        </div>
+
+        <p
+          data-stale
+          hidden
+          class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900"
+        >
+          Los datos cambiaron. Presioná Calcular para actualizar los resultados.
+        </p>
+
+        <div
+          data-error-summary
+          hidden
+          role="alert"
+          class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <p class="font-semibold">Revisá los datos:</p>
+          <ul data-error-list class="mt-1 list-inside list-disc"></ul>
+        </div>
+
+        <div class="mt-6 grid gap-2">
+          <button
+            type="submit"
+            class="inline-flex w-full items-center justify-center rounded-lg bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+          >
+            Calcular
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" data-action="reset" class={secondaryButtonClass}>
+              Restablecer
+            </button>
+            <button type="button" data-action="clear" class={secondaryButtonClass}>
+              Limpiar
+            </button>
+          </div>
+          <button
+            type="button"
+            data-action="export"
+            class="rounded-lg bg-[#8a5a12] px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#744c0f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a12] focus-visible:ring-offset-2"
+          >
+            Exportar Excel (CSV)
+          </button>
+          <p data-action-status role="status" aria-live="polite" class="min-h-5 text-xs text-slate-500"></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="lg:sticky lg:top-24">
+      <div class="rounded-2xl border border-slate-200 bg-white">
+        <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div>
+            <h3 class="font-display text-2xl text-ink">Gráfica</h3>
+            <p class="mt-1 text-sm text-slate-500">Se actualiza al calcular.</p>
+          </div>
+          <div class="flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1" role="group" aria-label="Tipo de gráfica">
+            <button type="button" data-chart-tab="composition" aria-pressed="true" class={chartTabClass}>
+              Composición
+            </button>
+            <button type="button" data-chart-tab="growth" aria-pressed="false" class={chartTabClass}>
+              Crecimiento
+            </button>
+            <button type="button" data-chart-tab="rates" aria-pressed="false" class={chartTabClass}>
+              Tasas
+            </button>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 sm:px-6">
+          <div data-chart-panel="composition">
+            <div data-chart-empty hidden class="flex h-72 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center text-sm text-slate-500">
+              Calculá el ejercicio para ver la gráfica.
+            </div>
+            <div data-chart-content>
+              <div class="relative h-72">
+                <canvas data-chart-canvas="composition" role="img" aria-label="Comparación entre capital inicial, intereses y monto total" class="block h-full w-full max-w-full"></canvas>
+              </div>
+              <details class="mt-4 text-xs text-slate-500">
+                <summary class="cursor-pointer font-medium text-slate-600">Ver datos de la gráfica</summary>
+                <div data-chart-table="composition" class="mt-3 overflow-x-auto"></div>
+              </details>
+            </div>
+          </div>
+
+          <div data-chart-panel="growth" hidden>
+            <div data-chart-empty hidden class="flex h-72 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center text-sm text-slate-500">
+              Calculá el ejercicio para ver la gráfica.
+            </div>
+            <div data-chart-content>
+              <div class="relative h-72">
+                <canvas data-chart-canvas="growth" role="img" aria-label="Crecimiento del interés a lo largo del tiempo" class="block h-full w-full max-w-full"></canvas>
+              </div>
+              <details class="mt-4 text-xs text-slate-500">
+                <summary class="cursor-pointer font-medium text-slate-600">Ver datos de la gráfica</summary>
+                <div data-chart-table="growth" class="mt-3 overflow-x-auto"></div>
+              </details>
+            </div>
+          </div>
+
+          <div data-chart-panel="rates" hidden>
+            <div data-chart-empty hidden class="flex h-72 items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center text-sm text-slate-500">
+              Calculá el ejercicio para ver la gráfica.
+            </div>
+            <div data-chart-content>
+              <div class="relative h-72">
+                <canvas data-chart-canvas="rates" role="img" aria-label="Comparación del interés con distintas tasas anuales" class="block h-full w-full max-w-full"></canvas>
+              </div>
+              <details class="mt-4 text-xs text-slate-500">
+                <summary class="cursor-pointer font-medium text-slate-600">Ver datos de la gráfica</summary>
+                <div data-chart-table="rates" class="mt-3 overflow-x-auto"></div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p data-live-status class="sr-only" aria-live="polite"></p>
+
+  <section data-results hidden class="mt-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="flex items-center gap-2.5 text-sm font-semibold text-slate-700">
+          <span class="h-px w-6 bg-ochre" aria-hidden="true"></span>
+          Resolución
+        </p>
+        <h3 class="mt-2 font-display text-3xl tracking-[-0.01em] text-ink sm:text-4xl">
+          Resultados
+        </h3>
+      </div>
+      <p data-results-target class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+        Capital inicial
+      </p>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+      <div class="space-y-4">
+        <div class="rounded-2xl bg-ink px-6 py-7 text-white">
+          <p data-result-label class="text-sm text-emerald-200">Capital inicial</p>
+          <p data-result-value class="mt-2 font-display text-4xl leading-none tracking-[-0.02em] sm:text-5xl">
+            —
+          </p>
+          <p data-result-note class="mt-4 max-w-sm text-sm leading-6 text-slate-300"></p>
+        </div>
+
+        <dl class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Interés</dt>
+            <dd data-summary-interest class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Capital inicial</dt>
+            <dd data-summary-capital class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Monto total (C + I)</dt>
+            <dd data-summary-total class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Fórmula utilizada
+          </p>
+          <p data-formula-expression class="mt-3 font-display text-2xl italic text-ink">
+            —
+          </p>
+          <p data-formula-substitution class="mt-3 overflow-x-auto text-sm leading-6 text-slate-600">
+            —
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Procedimiento
+          </p>
+          <ol data-steps class="mt-3 space-y-2.5 text-sm leading-6 text-slate-600"></ol>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Datos y conversiones
+          </p>
+          <dl data-input-summary class="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2"></dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div data-results-empty class="mt-12 rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-12 text-center">
+    <p class="font-display text-2xl text-ink">
+      Completá los datos y presioná Calcular
+    </p>
+    <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+      La resolución paso a paso y las gráficas van a aparecer acá.
+    </p>
+  </div>
+
+</section>
+
+<script>
+  import {
+    RATE_TYPES,
+    TARGETS,
+    TIME_UNITS,
+    formatInputNumber,
+    formatMoney,
+    formatNumber,
+    formatPercent,
+    formatPlainNumber,
+    normalizeYearDays,
+    parseNumber,
+    solveExercise,
+    timeToYears,
+    toAnnualRate,
+  } from '../scripts/simple-interest.js';
+  import {
+    buildChartData,
+    createCharts,
+    resizeCharts,
+    updateCharts,
+  } from '../scripts/simple-interest-charts.js';
+  import { simpleInterestExercises } from '../data/exercises.js';
+
+  const root = document.querySelector('[data-simple-interest-calculator]');
+
+  if (root) {
+    const exercises = simpleInterestExercises;
+    const initialExercise = exercises[0] ?? null;
+
+    const form = root.querySelector('[data-calculator-form]');
+    const exerciseSelect = root.querySelector('[data-exercise-select]');
+    const exerciseHeading = root.querySelector('[data-exercise-heading]');
+    const exerciseStatement = root.querySelector('[data-exercise-statement]');
+    const fields = {
+      I: root.querySelector('[data-field="I"]'),
+      C: root.querySelector('[data-field="C"]'),
+      i: root.querySelector('[data-field="i"]'),
+      n: root.querySelector('[data-field="n"]'),
+    };
+    const timeUnitSelect = root.querySelector('[data-time-unit]');
+    const rateTypeSelect = root.querySelector('[data-rate-type]');
+    const yearDaysInputs = [...root.querySelectorAll('[data-year-days]')];
+    const targetButtons = [...root.querySelectorAll('[data-target-option]')];
+    const targetBoxes = {
+      I: root.querySelector('[data-target-box="I"]'),
+      C: root.querySelector('[data-target-box="C"]'),
+      i: root.querySelector('[data-target-box="i"]'),
+      n: root.querySelector('[data-target-box="n"]'),
+    };
+    const targetBadges = {
+      I: root.querySelector('[data-target-badge="I"]'),
+      C: root.querySelector('[data-target-badge="C"]'),
+      i: root.querySelector('[data-target-badge="i"]'),
+      n: root.querySelector('[data-target-badge="n"]'),
+    };
+    const errorSummary = root.querySelector('[data-error-summary]');
+    const errorList = root.querySelector('[data-error-list]');
+    const errorElements = {
+      I: root.querySelector('[data-error="I"]'),
+      C: root.querySelector('[data-error="C"]'),
+      i: root.querySelector('[data-error="i"]'),
+      n: root.querySelector('[data-error="n"]'),
+    };
+    const conversionTime = root.querySelector('[data-conversion-time]');
+    const conversionRate = root.querySelector('[data-conversion-rate]');
+    const staleNotice = root.querySelector('[data-stale]');
+    const results = root.querySelector('[data-results]');
+    const resultsEmpty = root.querySelector('[data-results-empty]');
+    const resultsTarget = root.querySelector('[data-results-target]');
+    const resultLabel = root.querySelector('[data-result-label]');
+    const resultValue = root.querySelector('[data-result-value]');
+    const resultNote = root.querySelector('[data-result-note]');
+    const summaryInterest = root.querySelector('[data-summary-interest]');
+    const summaryCapital = root.querySelector('[data-summary-capital]');
+    const summaryTotal = root.querySelector('[data-summary-total]');
+    const formulaExpression = root.querySelector('[data-formula-expression]');
+    const formulaSubstitution = root.querySelector('[data-formula-substitution]');
+    const stepsList = root.querySelector('[data-steps]');
+    const inputSummary = root.querySelector('[data-input-summary]');
+    const liveStatus = root.querySelector('[data-live-status]');
+    const actionStatus = root.querySelector('[data-action-status]');
+    const chartTabs = [...root.querySelectorAll('[data-chart-tab]')];
+    const chartPanels = [...root.querySelectorAll('[data-chart-panel]')];
+    const chartCanvases = {
+      composition: root.querySelector('[data-chart-canvas="composition"]'),
+      growth: root.querySelector('[data-chart-canvas="growth"]'),
+      rates: root.querySelector('[data-chart-canvas="rates"]'),
+    };
+    const chartTables = {
+      composition: root.querySelector('[data-chart-table="composition"]'),
+      growth: root.querySelector('[data-chart-table="growth"]'),
+      rates: root.querySelector('[data-chart-table="rates"]'),
+    };
+
+    const state = {
+      target: initialTargetValue(),
+      baseline: null,
+      currentSnapshot: null,
+      lastResult: null,
+      hasCalculated: false,
+      charts: null,
+      activeChart: 'composition',
+    };
+
+    function initialTargetValue() {
+      return exercises[0]?.target ?? 'C';
+    }
+
+    function getYearDays() {
+      const selected = yearDaysInputs.find((input) => input.checked);
+      return normalizeYearDays(selected?.value);
+    }
+
+    function getFormValues() {
+      return {
+        target: state.target,
+        I: fields.I.value,
+        C: fields.C.value,
+        i: fields.i.value,
+        n: fields.n.value,
+        timeUnit: timeUnitSelect.value,
+        rateType: rateTypeSelect.value,
+        yearDays: getYearDays(),
+      };
+    }
+
+    function setStatus(message) {
+      actionStatus.textContent = message;
+    }
+
+    function announce(message) {
+      liveStatus.textContent = '';
+      window.requestAnimationFrame(() => {
+        liveStatus.textContent = message;
+      });
+    }
+
+    const moneyFields = new Set(['I', 'C']);
+    const moneyInputOptions = {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    };
+
+    function setFieldValue(fieldName, value) {
+      const field = fields[fieldName];
+      if (!field) return;
+
+      if (value === null || value === undefined || value === '') {
+        field.value = '';
+        return;
+      }
+
+      const parsed = typeof value === 'number' ? value : parseNumber(value);
+      field.value = Number.isFinite(parsed)
+        ? formatInputNumber(
+            parsed,
+            moneyFields.has(fieldName) ? moneyInputOptions : undefined
+          )
+        : String(value);
+    }
+
+    function setFields(values) {
+      setFieldValue('I', values.I);
+      setFieldValue('C', values.C);
+      setFieldValue('i', values.i);
+      setFieldValue('n', values.n);
+      timeUnitSelect.value = values.timeUnit ?? 'meses';
+      rateTypeSelect.value = values.rateType ?? 'anual';
+      const yearDays = normalizeYearDays(values.yearDays);
+      yearDaysInputs.forEach((input) => {
+        input.checked = Number(input.value) === yearDays;
+      });
+    }
+
+    function setTarget(target) {
+      state.target = TARGETS[target] ? target : 'I';
+      updateTargetUi();
+    }
+
+    function updateTargetUi() {
+      targetButtons.forEach((button) => {
+        button.setAttribute(
+          'aria-pressed',
+          String(button.dataset.targetOption === state.target)
+        );
+      });
+
+      Object.entries(targetBoxes).forEach(([key, box]) => {
+        box.dataset.target = String(key === state.target);
+      });
+
+      Object.entries(targetBadges).forEach(([key, badge]) => {
+        badge.hidden = key !== state.target;
+      });
+    }
+
+    function clearFieldError(fieldName) {
+      const errorElement = errorElements[fieldName];
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.hidden = true;
+      }
+
+      const input = fields[fieldName];
+      if (input) input.removeAttribute('aria-invalid');
+
+      const box = targetBoxes[fieldName];
+      if (box) box.dataset.invalid = 'false';
+    }
+
+    function clearErrors() {
+      Object.keys(errorElements).forEach(clearFieldError);
+      errorSummary.hidden = true;
+      errorList.replaceChildren();
+    }
+
+    function showErrors(errors) {
+      clearErrors();
+      const messages = [];
+
+      Object.entries(errors).forEach(([fieldName, message]) => {
+        const errorElement = errorElements[fieldName];
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.hidden = false;
+        }
+
+        const input = fields[fieldName];
+        if (input) input.setAttribute('aria-invalid', 'true');
+
+        const box = targetBoxes[fieldName];
+        if (box) box.dataset.invalid = 'true';
+
+        messages.push(message);
+      });
+
+      if (messages.length === 0) return;
+
+      errorList.replaceChildren(
+        ...messages.map((message) => {
+          const item = document.createElement('li');
+          item.textContent = message;
+          return item;
+        })
+      );
+      errorSummary.hidden = false;
+
+      const firstInvalid = Object.keys(errors).find((fieldName) => fields[fieldName]);
+      if (firstInvalid) fields[firstInvalid].focus();
+    }
+
+    function showStale() {
+      if (!state.hasCalculated) return;
+      staleNotice.hidden = false;
+    }
+
+    function hideStale() {
+      staleNotice.hidden = true;
+    }
+
+    function updateConversions() {
+      const n = parseNumber(fields.n.value);
+      const i = parseNumber(fields.i.value);
+      const yearDays = getYearDays();
+      const timeUnit = timeUnitSelect.value;
+      const rateType = rateTypeSelect.value;
+
+      if (Number.isFinite(n) && n > 0) {
+        const years = timeToYears(n, timeUnit, yearDays);
+        const days = years * yearDays;
+        const calendarDays = years * 365;
+        const baseText =
+          yearDays === 360
+            ? `${formatNumber(days, 2)} días comerciales · ${formatNumber(calendarDays, 2)} días calendario`
+            : `${formatNumber(days, 2)} días base 365`;
+
+        conversionTime.textContent = `${formatNumber(n, 4)} ${TIME_UNITS[timeUnit].label} = ${formatNumber(years, 4)} años = ${baseText}.`;
+      } else {
+        conversionTime.textContent = 'Ingresá un tiempo para ver la conversión.';
+      }
+
+      if (Number.isFinite(i) && i > 0) {
+        const annual = toAnnualRate(i, rateType, yearDays);
+        conversionRate.textContent = `${formatPercent(i, 4)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
+      } else {
+        conversionRate.textContent = 'Ingresá una tasa para ver la conversión.';
+      }
+    }
+
+    function renderResult(result) {
+      const rateLabel = RATE_TYPES[result.rateType].label;
+      const timeLabel = TIME_UNITS[result.timeUnit].label;
+
+      resultsTarget.textContent = result.result.label;
+      resultLabel.textContent = result.result.label;
+      resultValue.textContent = result.result.formatted;
+      resultNote.textContent =
+        result.target === 'C'
+          ? 'Capital necesario para generar los intereses indicados con esa tasa y ese tiempo.'
+          : result.target === 'I'
+            ? 'Interés generado por el capital durante el tiempo indicado.'
+            : result.target === 'i'
+              ? `Tasa ${rateLabel} equivalente al interés del ejercicio.`
+              : 'Tiempo necesario para generar el interés indicado.';
+
+      summaryInterest.textContent = formatMoney(result.summary.interest);
+      summaryCapital.textContent = formatMoney(result.summary.capital);
+      summaryTotal.textContent = formatMoney(result.summary.total);
+
+      formulaExpression.textContent = result.formula.expression;
+      formulaSubstitution.textContent = result.formula.substitution;
+
+      stepsList.replaceChildren(
+        ...result.steps.map((step) => {
+          const item = document.createElement('li');
+          item.textContent = step;
+          if (step.startsWith('Resultado:')) {
+            item.className = 'font-semibold text-ink';
+          }
+          return item;
+        })
+      );
+
+      const dataRows = [
+        ['Interés', formatMoney(result.summary.interest)],
+        ['Capital inicial', formatMoney(result.summary.capital)],
+        ['Monto total', formatMoney(result.summary.total)],
+        ['Tasa', `${formatPercent(result.values.i, 4)} ${rateLabel}`],
+        ['Tiempo', `${formatNumber(result.values.n, 4)} ${timeLabel}`],
+        ['Base de días', `${result.yearDays} días`],
+        ['Tiempo en años', `${formatNumber(result.conversions.nYears, 4)} años`],
+        ['Tiempo en días', `${formatNumber(result.conversions.nDays, 2)} días`],
+        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, 4)],
+        ['Tasa anual decimal', formatNumber(result.conversions.iAnnual, 6)],
+      ];
+
+      if (result.yearDays === 360) {
+        dataRows.push([
+          'Equivalencia calendario',
+          `${formatNumber(result.conversions.nCalendarDays, 2)} días`,
+        ]);
+      }
+
+      inputSummary.replaceChildren(
+        ...dataRows.map(([term, description]) => {
+          const row = document.createElement('div');
+          row.className = 'flex items-baseline justify-between gap-3 border-b border-slate-100 pb-1.5';
+          const dt = document.createElement('dt');
+          dt.className = 'shrink-0 text-slate-500';
+          dt.textContent = term;
+          const dd = document.createElement('dd');
+          dd.className = 'text-right font-medium tabular-nums text-ink';
+          dd.textContent = description;
+          row.append(dt, dd);
+          return row;
+        })
+      );
+
+      results.hidden = false;
+      resultsEmpty.hidden = true;
+      hideStale();
+    }
+
+    function updateChartEmptyState(showEmpty) {
+      root.querySelectorAll('[data-chart-empty]').forEach((element) => {
+        element.hidden = !showEmpty;
+      });
+      root.querySelectorAll('[data-chart-content]').forEach((element) => {
+        element.hidden = showEmpty;
+      });
+    }
+
+    function renderTable(container, headers, rows) {
+      container.replaceChildren();
+      const table = document.createElement('table');
+      table.className = 'w-full text-left text-xs';
+      const thead = document.createElement('thead');
+      const headRow = document.createElement('tr');
+      headers.forEach((header) => {
+        const th = document.createElement('th');
+        th.className = 'border-b border-slate-200 pb-2 font-semibold text-slate-600';
+        th.scope = 'col';
+        th.textContent = header;
+        headRow.append(th);
+      });
+      thead.append(headRow);
+      const tbody = document.createElement('tbody');
+      rows.forEach((row) => {
+        const tr = document.createElement('tr');
+        row.forEach((cell) => {
+          const td = document.createElement('td');
+          td.className = 'border-b border-slate-100 py-2 text-slate-600';
+          td.textContent = cell;
+          tr.append(td);
+        });
+        tbody.append(tr);
+      });
+      table.append(thead, tbody);
+      container.append(table);
+    }
+
+    function renderChartTables(result) {
+      const data = buildChartData(result);
+      if (!data) return;
+
+      renderTable(
+        chartTables.composition,
+        ['Concepto', 'Monto'],
+        [
+          ['Capital inicial', formatMoney(result.summary.capital)],
+          ['Interés', formatMoney(result.summary.interest)],
+          ['Monto total', formatMoney(result.summary.total)],
+        ]
+      );
+
+      renderTable(
+        chartTables.growth,
+        ['Tiempo', 'Interés acumulado'],
+        data.growth.labels.map((label, index) => [
+          `${label} ${data.growth.unit}`,
+          formatMoney(data.growth.values[index]),
+        ])
+      );
+
+      renderTable(
+        chartTables.rates,
+        ['Tasa anual', 'Interés'],
+        data.rates.labels.map((label, index) => [
+          label,
+          formatMoney(data.rates.values[index]),
+        ])
+      );
+    }
+
+    function panelIsVisible() {
+      const panel = root.closest('[data-tab-panel]');
+      return !panel || !panel.hidden;
+    }
+
+    function ensureCharts() {
+      if (!panelIsVisible()) return false;
+      if (state.charts) return true;
+
+      state.charts = createCharts(
+        {
+          composition: chartCanvases.composition,
+          growth: chartCanvases.growth,
+          rates: chartCanvases.rates,
+        },
+        state.lastResult
+      );
+      renderChartTables(state.lastResult);
+      return true;
+    }
+
+    function updateChartsIfReady(result) {
+      if (!result) return;
+      if (state.charts) {
+        updateCharts(state.charts, result);
+        renderChartTables(result);
+        return;
+      }
+
+      if (ensureCharts()) {
+        updateCharts(state.charts, result);
+        renderChartTables(result);
+      }
+    }
+
+    function calculate({ silent = false } = {}) {
+      const result = solveExercise(getFormValues());
+      clearErrors();
+
+      if (!result.ok) {
+        showErrors(result.errors);
+        showStale();
+        if (!silent) announce('No se pudo calcular. Revisá los datos.');
+        return false;
+      }
+
+      state.lastResult = result;
+      state.hasCalculated = true;
+      updateChartEmptyState(false);
+      renderResult(result);
+
+      setFieldValue(result.target, result.result.value);
+
+      updateConversions();
+      updateChartsIfReady(result);
+
+      if (!silent) {
+        setStatus('Resultado actualizado.');
+        announce(`${result.result.label}: ${result.result.formatted}`);
+      }
+
+      return true;
+    }
+
+    function applySnapshot(snapshot, { calculateAfter = true } = {}) {
+      if (!snapshot) return;
+
+      state.currentSnapshot = snapshot;
+      exerciseHeading.textContent = snapshot.title;
+      exerciseStatement.textContent = snapshot.statement;
+      syncExerciseSelect(snapshot.presetId);
+      setTarget(snapshot.target ?? 'I');
+      setFields({
+        I: snapshot.values?.I ?? null,
+        C: snapshot.values?.C ?? null,
+        i: snapshot.values?.i ?? null,
+        n: snapshot.values?.n ?? null,
+        timeUnit: snapshot.timeUnit ?? 'meses',
+        rateType: snapshot.rateType ?? 'anual',
+        yearDays: snapshot.yearDays ?? 360,
+      });
+      clearErrors();
+      hideStale();
+      setStatus('');
+
+      if (calculateAfter) {
+        calculate({ silent: true });
+      } else {
+        updateConversions();
+      }
+    }
+
+    function syncExerciseSelect(presetId) {
+      if (presetId) exerciseSelect.value = presetId;
+    }
+
+    function snapshotFromExercise(exercise) {
+      return {
+        presetId: exercise.id,
+        title: exercise.title,
+        statement: exercise.statement,
+        values: { ...exercise.data },
+        target: exercise.target,
+        timeUnit: exercise.data.timeUnit,
+        rateType: exercise.data.rateType,
+        yearDays: exercise.yearDays ?? 360,
+      };
+    }
+
+    function loadExerciseById(id) {
+      const exercise = exercises.find((item) => item.id === id);
+      if (exercise) {
+        const snapshot = snapshotFromExercise(exercise);
+        state.baseline = snapshot;
+        applySnapshot(snapshot);
+      }
+    }
+
+    function resetExercise() {
+      if (!state.baseline) return;
+      applySnapshot(state.baseline);
+      setStatus('Datos restablecidos.');
+      announce('Datos restablecidos al ejercicio original.');
+    }
+
+    function clearExercise() {
+      Object.values(fields).forEach((field) => {
+        field.value = '';
+      });
+      state.lastResult = null;
+      state.hasCalculated = false;
+      clearErrors();
+      hideStale();
+      updateConversions();
+      results.hidden = true;
+      resultsEmpty.hidden = false;
+      updateChartEmptyState(true);
+      setStatus('Formulario limpio.');
+      announce('Formulario limpio. Podés completar nuevos datos.');
+    }
+
+    function csvEscape(value) {
+      return `"${String(value ?? '')
+        .replace(/\r?\n/g, ' ')
+        .replace(/"/g, '""')}"`;
+    }
+
+    function exportCsv() {
+      const valid = calculate({ silent: true });
+      if (!valid || !state.lastResult) {
+        setStatus('Calculá el ejercicio antes de exportar.');
+        return;
+      }
+
+      const result = state.lastResult;
+      const snapshot = state.currentSnapshot;
+      const headers = [
+        'Ejercicio',
+        'Enunciado',
+        'Fecha',
+        'Variable calculada',
+        'Interés',
+        'Capital',
+        'Tasa',
+        'Tipo de tasa',
+        'Tiempo',
+        'Unidad de tiempo',
+        'Base de días',
+        'Tasa anual decimal',
+        'Tiempo en años',
+        'Tiempo en días',
+        'Días calendario',
+        'Fórmula',
+        'Sustitución',
+        'Procedimiento',
+        'Resultado',
+        'Monto total',
+      ];
+
+      const values = [
+        snapshot?.title ?? exerciseHeading.textContent.trim(),
+        snapshot?.statement ?? exerciseStatement.textContent.trim(),
+        new Intl.DateTimeFormat('es-AR', {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        }).format(new Date()),
+        result.result.label,
+        formatPlainNumber(result.summary.interest),
+        formatPlainNumber(result.summary.capital),
+        formatPlainNumber(result.values.i),
+        result.rateType,
+        formatPlainNumber(result.values.n),
+        result.timeUnit,
+        String(result.yearDays),
+        formatPlainNumber(result.conversions.iAnnual),
+        formatPlainNumber(result.conversions.nYears),
+        formatPlainNumber(result.conversions.nDays),
+        formatPlainNumber(result.conversions.nCalendarDays),
+        result.formula.expression,
+        result.formula.substitution,
+        result.steps.join(' | '),
+        result.result.formatted,
+        formatPlainNumber(result.summary.total),
+      ];
+
+      const csv = [
+        headers.map(csvEscape).join(';'),
+        values.map(csvEscape).join(';'),
+      ].join('\r\n');
+
+      const blob = new Blob([`\uFEFF${csv}`], {
+        type: 'text/csv;charset=utf-8;',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const fileBase = (snapshot?.title ?? 'interes-simple')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      link.href = url;
+      link.download = `${fileBase || 'interes-simple'}.csv`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setStatus('Archivo CSV descargado.');
+      announce('Archivo CSV descargado.');
+    }
+
+    function setChartTab(name) {
+      state.activeChart = name;
+      chartTabs.forEach((tab) => {
+        tab.setAttribute('aria-pressed', String(tab.dataset.chartTab === name));
+      });
+      chartPanels.forEach((panel) => {
+        panel.hidden = panel.dataset.chartPanel !== name;
+      });
+
+      ensureCharts();
+      window.requestAnimationFrame(() => resizeCharts(state.charts));
+    }
+
+    targetButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        setTarget(button.dataset.targetOption);
+        showStale();
+      });
+    });
+
+    exerciseSelect.addEventListener('change', () => {
+      loadExerciseById(exerciseSelect.value);
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      calculate();
+    });
+
+    form.addEventListener('input', (event) => {
+      const fieldName = event.target.dataset.field;
+      if (!fieldName) return;
+      clearFieldError(fieldName);
+      updateConversions();
+      showStale();
+    });
+
+    form.addEventListener('change', (event) => {
+      if (
+        event.target.matches(
+          '[data-time-unit], [data-rate-type], [data-year-days]'
+        )
+      ) {
+        updateConversions();
+        showStale();
+      }
+    });
+
+    root.querySelector('[data-action="reset"]').addEventListener('click', resetExercise);
+    root.querySelector('[data-action="clear"]').addEventListener('click', clearExercise);
+    root.querySelector('[data-action="export"]').addEventListener('click', exportCsv);
+
+    chartTabs.forEach((tab) => {
+      tab.addEventListener('click', () => setChartTab(tab.dataset.chartTab));
+    });
+
+    document.addEventListener('topic-tab-change', (event) => {
+      if (event.detail?.tab !== 'ejercicios') return;
+      window.requestAnimationFrame(() => {
+        ensureCharts();
+        resizeCharts(state.charts);
+      });
+    });
+
+    const initialSnapshot = initialExercise
+      ? snapshotFromExercise(initialExercise)
+      : null;
+
+    if (initialSnapshot) {
+      state.baseline = initialSnapshot;
+      applySnapshot(initialSnapshot);
+      setChartTab('composition');
+    } else {
+      updateChartEmptyState(true);
+      updateConversions();
+    }
+  }
+</script>

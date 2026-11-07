@@ -7,7 +7,7 @@ export const topicContent = {
     ],
     example: '$1.000 al 10% anual generan $100 de interés cada año.',
     formula: {
-      expression: 'I = C · i · t',
+      expression: 'I = C · i · n',
       note: 'El interés se calcula una sola vez sobre el capital inicial, sin reinvertir los intereses de períodos anteriores.',
     },
     symbols: [
@@ -27,7 +27,7 @@ export const topicContent = {
         description: 'El porcentaje que se aplica en cada período, expresado en decimal. Por ejemplo, 10% = 0,10.',
       },
       {
-        symbol: 't',
+        symbol: 'n',
         name: 'Tiempo',
         description: 'La cantidad de períodos de la operación. La tasa y el tiempo deben expresarse en la misma unidad.',
       },

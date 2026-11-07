@@ -1,5 +1,6 @@
 ---
 import Header from '../../components/Header.astro';
+import SimpleInterestCalculator from '../../components/SimpleInterestCalculator.astro';
 import '../../styles/global.css';
 import { units } from '../../data/catalog.js';
 import { topicContent } from '../../data/topics.js';
@@ -172,48 +173,55 @@ const dots = {
         </div>
       </header>
 
-      <div class="mt-12 grid gap-12 lg:grid-cols-3">
-        <div class="lg:col-span-2">
-          {content ? (
-            <div data-topic-tabs>
-              <div
-                role="tablist"
-                aria-label="Contenido del tema"
-                class="flex gap-8 border-b border-slate-200"
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  id="tab-concepto"
-                  aria-controls="panel-concepto"
-                  aria-selected="true"
-                  data-tab-button
-                  data-tab="concepto"
-                  class="-mb-px border-b-2 border-transparent pb-3 pt-1 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-selected:border-ochre aria-selected:text-ink"
-                >
-                  Concepto
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  id="tab-ejercicios"
-                  aria-controls="panel-ejercicios"
-                  aria-selected="false"
-                  tabindex="-1"
-                  data-tab-button
-                  data-tab="ejercicios"
-                  class="-mb-px border-b-2 border-transparent pb-3 pt-1 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-selected:border-ochre aria-selected:text-ink"
-                >
-                  Ejercicios
-                </button>
-              </div>
+      <div data-topic-tabs>
+        {content && (
+          <div
+            role="tablist"
+            aria-label="Contenido del tema"
+            class="mt-10 flex gap-8 border-b border-slate-200"
+          >
+            <button
+              type="button"
+              role="tab"
+              id="tab-concepto"
+              aria-controls="panel-concepto"
+              aria-selected="true"
+              data-tab-button
+              data-tab="concepto"
+              class="-mb-px border-b-2 border-transparent pt-1 pb-3 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-selected:border-ochre aria-selected:text-ink"
+            >
+              Concepto
+            </button>
+            <button
+              type="button"
+              role="tab"
+              id="tab-ejercicios"
+              aria-controls="panel-ejercicios"
+              aria-selected="false"
+              tabindex="-1"
+              data-tab-button
+              data-tab="ejercicios"
+              class="-mb-px border-b-2 border-transparent pt-1 pb-3 text-sm font-semibold text-slate-500 transition hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 aria-selected:border-ochre aria-selected:text-ink"
+            >
+              Ejercicios
+            </button>
+          </div>
+        )}
 
+        <div
+          class:list={[
+            'grid gap-12 lg:grid-cols-3',
+            content ? 'mt-10' : 'mt-12',
+          ]}
+        >
+          {content ? (
+            <>
               <div
                 role="tabpanel"
                 id="panel-concepto"
                 aria-labelledby="tab-concepto"
                 data-tab-panel="concepto"
-                class="mt-10"
+                class="lg:col-span-2"
               >
                 <article>
                   <section aria-labelledby="que-es">
@@ -313,25 +321,14 @@ const dots = {
                 aria-labelledby="tab-ejercicios"
                 data-tab-panel="ejercicios"
                 hidden
-                class="mt-10"
+                class="lg:col-span-3"
               >
-                <section
-                  class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-16 text-center"
-                >
-                  <p class="font-display text-2xl text-ink">
-                    Ejercicios en preparación
-                  </p>
-                  <p
-                    class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"
-                  >
-                    Todavía no hay ejercicios para este tema.
-                  </p>
-                </section>
+                <SimpleInterestCalculator />
               </div>
-            </div>
+            </>
           ) : (
             <section
-              class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-16 text-center sm:px-10"
+              class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-16 text-center sm:px-10 lg:col-span-2"
             >
               <p class="font-display text-2xl text-ink">
                 Contenido en preparación
@@ -360,54 +357,55 @@ const dots = {
               </a>
             </section>
           )}
-        </div>
 
-        <aside
-          aria-labelledby="otros-temas"
-          class="lg:sticky lg:top-24 lg:col-span-1 lg:self-start"
-        >
-          <h2 id="otros-temas" class="text-sm font-semibold text-slate-900">
-            Otros temas de la unidad
-          </h2>
+          <aside
+            data-topic-aside
+            aria-labelledby="otros-temas"
+            class="lg:sticky lg:top-24 lg:col-span-1 lg:self-start"
+          >
+            <h2 id="otros-temas" class="text-sm font-semibold text-slate-900">
+              Otros temas de la unidad
+            </h2>
 
-          {otherTopics.length > 0 ? (
-            <ul class="mt-4 space-y-1">
-              {otherTopics.map((topic) => (
-                <li>
-                  <a
-                    href={`/${unit.slug}/${topic.slug}`}
-                    class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-600 transition hover:bg-white hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                  >
-                    <span
-                      class:list={[
-                        'h-1.5 w-1.5 shrink-0 rounded-full',
-                        dots[topic.accent],
-                      ]}
-                      aria-hidden="true"
-                    />
-                    <span class="flex-1">{topic.title}</span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.75"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="h-4 w-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500"
-                      aria-hidden="true"
+            {otherTopics.length > 0 ? (
+              <ul class="mt-4 space-y-1">
+                {otherTopics.map((topic) => (
+                  <li>
+                    <a
+                      href={`/${unit.slug}/${topic.slug}`}
+                      class="group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-600 transition hover:bg-white hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                     >
-                      <path d="m9 6 6 6-6 6" />
-                    </svg>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p class="mt-4 text-sm text-slate-500">
-              Es el único tema de esta unidad por ahora.
-            </p>
-          )}
-        </aside>
+                      <span
+                        class:list={[
+                          'h-1.5 w-1.5 shrink-0 rounded-full',
+                          dots[topic.accent],
+                        ]}
+                        aria-hidden="true"
+                      />
+                      <span class="flex-1">{topic.title}</span>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.75"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="h-4 w-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-slate-500"
+                        aria-hidden="true"
+                      >
+                        <path d="m9 6 6 6-6 6" />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="mt-4 text-sm text-slate-500">
+                Es el único tema de esta unidad por ahora.
+              </p>
+            )}
+          </aside>
+        </div>
       </div>
     </main>
 
@@ -417,42 +415,53 @@ const dots = {
       if (topicTabs) {
         const tabs = [...topicTabs.querySelectorAll('[data-tab-button]')];
         const panels = [...topicTabs.querySelectorAll('[data-tab-panel]')];
+        const aside = topicTabs.querySelector('[data-topic-aside]');
 
-        const selectTab = (name, focus = false) => {
-          tabs.forEach((tab) => {
-            const selected = tab.dataset.tab === name;
-            tab.setAttribute('aria-selected', String(selected));
-            tab.tabIndex = selected ? 0 : -1;
+        if (tabs.length > 0) {
+          const selectTab = (name, focus = false) => {
+            tabs.forEach((tab) => {
+              const selected = tab.dataset.tab === name;
+              tab.setAttribute('aria-selected', String(selected));
+              tab.tabIndex = selected ? 0 : -1;
 
-            if (selected && focus) tab.focus();
+              if (selected && focus) tab.focus();
+            });
+
+            panels.forEach((panel) => {
+              panel.hidden = panel.dataset.tabPanel !== name;
+            });
+
+            if (aside) aside.hidden = name === 'ejercicios';
+
+            document.dispatchEvent(
+              new CustomEvent('topic-tab-change', {
+                detail: { tab: name },
+              })
+            );
+          };
+
+          tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => selectTab(tab.dataset.tab));
+
+            tab.addEventListener('keydown', (event) => {
+              let nextIndex = null;
+
+              if (event.key === 'ArrowRight') {
+                nextIndex = (index + 1) % tabs.length;
+              }
+              if (event.key === 'ArrowLeft') {
+                nextIndex = (index - 1 + tabs.length) % tabs.length;
+              }
+              if (event.key === 'Home') nextIndex = 0;
+              if (event.key === 'End') nextIndex = tabs.length - 1;
+
+              if (nextIndex !== null) {
+                event.preventDefault();
+                selectTab(tabs[nextIndex].dataset.tab, true);
+              }
+            });
           });
-
-          panels.forEach((panel) => {
-            panel.hidden = panel.dataset.tabPanel !== name;
-          });
-        };
-
-        tabs.forEach((tab, index) => {
-          tab.addEventListener('click', () => selectTab(tab.dataset.tab));
-
-          tab.addEventListener('keydown', (event) => {
-            let nextIndex = null;
-
-            if (event.key === 'ArrowRight') {
-              nextIndex = (index + 1) % tabs.length;
-            }
-            if (event.key === 'ArrowLeft') {
-              nextIndex = (index - 1 + tabs.length) % tabs.length;
-            }
-            if (event.key === 'Home') nextIndex = 0;
-            if (event.key === 'End') nextIndex = tabs.length - 1;
-
-            if (nextIndex !== null) {
-              event.preventDefault();
-              selectTab(tabs[nextIndex].dataset.tab, true);
-            }
-          });
-        });
+        }
       }
     </script>
   </body>
