@@ -13,11 +13,13 @@ import {
 } from 'chart.js';
 
 import {
+  RATE_TYPES,
   TIME_UNITS,
   formatCompactMoney,
   formatMoney,
   formatNumber,
   formatPercent,
+  rateFactor,
   timeToYears,
 } from './simple-interest.js';
 
@@ -146,9 +148,10 @@ function growthOptions() {
 
 function ratesOptions() {
   return baseOptions({
-    xTitle: 'Tasa anual',
+    xTitle: 'Tasa',
     yTitle: 'Interés',
-    tooltipTitle: (items) => `Tasa anual: ${items[0].label}`,
+    tooltipTitle: (items) =>
+      `Tasa ${items[0].chart.$rateTypeLabel ?? 'anual'}: ${items[0].label}`,
     tooltipLabel: (context) => `Interés: ${formatMoney(context.parsed.y)}`,
   });
 }
@@ -180,22 +183,27 @@ function buildGrowthData(result) {
 
 function buildRatesData(result) {
   const { capital } = result.summary;
-  const { iAnnual, nYears } = result.conversions;
-  const currentPercent = iAnnual * 100;
+  const { nYears } = result.conversions;
+  const rateType = result.rateType;
+  const factor = rateFactor(rateType);
+  const currentPercent = result.values.i;
   const factors = [0.5, 0.75, 1, 1.25, 1.5];
   const rates =
     currentPercent > 0
-      ? factors.map((factor) => currentPercent * factor)
+      ? factors.map((multiplier) => currentPercent * multiplier)
       : [5, 10, 15, 20, 25];
 
   return {
     rates,
-    labels: rates.map((rate) => formatPercent(rate, 2)),
-    values: rates.map((rate) => capital * (rate / 100) * nYears),
+    labels: rates.map((rate) => formatPercent(rate, 1)),
+    values: rates.map(
+      (rate) => capital * ((rate / 100) * factor) * nYears
+    ),
     colors: rates.map((_, index) =>
       index === 2 ? OCHRE : 'rgba(5, 150, 105, 0.55)'
     ),
     currentIndex: currentPercent > 0 ? 2 : null,
+    rateType,
   };
 }
 
@@ -300,6 +308,8 @@ export function updateCharts(charts, result) {
   charts.rates.data.labels = data.rates.labels;
   charts.rates.data.datasets[0].data = data.rates.values;
   charts.rates.data.datasets[0].backgroundColor = data.rates.colors;
+  charts.rates.$rateTypeLabel = RATE_TYPES[data.rates.rateType].label;
+  charts.rates.options.scales.x.title.text = `Tasa ${charts.rates.$rateTypeLabel}`;
   charts.rates.update();
 }
 

@@ -436,7 +436,7 @@ const fieldValue = (value, options) => {
             </div>
             <div data-chart-content>
               <div class="relative h-72">
-                <canvas data-chart-canvas="rates" role="img" aria-label="Comparación del interés con distintas tasas anuales" class="block h-full w-full max-w-full"></canvas>
+                <canvas data-chart-canvas="rates" role="img" aria-label="Comparación del interés con distintas tasas" class="block h-full w-full max-w-full"></canvas>
               </div>
               <details class="mt-4 text-xs text-slate-500">
                 <summary class="cursor-pointer font-medium text-slate-600">Ver datos de la gráfica</summary>
@@ -685,7 +685,7 @@ const fieldValue = (value, options) => {
     };
     const rateInputOptions = {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 1,
     };
 
     function setFieldValue(fieldName, value) {
@@ -838,7 +838,7 @@ const fieldValue = (value, options) => {
 
       if (Number.isFinite(i) && i > 0) {
         const annual = toAnnualRate(i, rateType, yearDays);
-        conversionRate.textContent = `${formatPercent(i, 2)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
+        conversionRate.textContent = `${formatPercent(i, 1)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
       } else {
         conversionRate.textContent = 'Ingresá una tasa para ver la conversión.';
       }
@@ -882,12 +882,12 @@ const fieldValue = (value, options) => {
         ['Interés', formatMoney(result.summary.interest)],
         ['Capital inicial', formatMoney(result.summary.capital)],
         ['Monto total', formatMoney(result.summary.total)],
-        ['Tasa', `${formatPercent(result.values.i, 2)} ${rateLabel}`],
+        ['Tasa', `${formatPercent(result.values.i, 1)} ${rateLabel}`],
         ['Tiempo', `${formatNumber(result.values.n, 4)} ${timeLabel}`],
         ['Base de días', `${result.yearDays} días`],
         ['Tiempo en años', `${formatNumber(result.conversions.nYears, 4)} años`],
         ['Tiempo en días', `${formatNumber(result.conversions.nDays, 2)} días`],
-        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, 2)],
+        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, 1)],
         ['Tasa anual decimal', formatNumber(result.conversions.iAnnual, 6)],
       ];
 
@@ -981,7 +981,7 @@ const fieldValue = (value, options) => {
 
       renderTable(
         chartTables.rates,
-        ['Tasa anual', 'Interés'],
+        [`Tasa ${RATE_TYPES[result.rateType].label}`, 'Interés'],
         data.rates.labels.map((label, index) => [
           label,
           formatMoney(data.rates.values[index]),
