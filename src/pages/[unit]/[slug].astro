@@ -29,6 +29,56 @@ const dots = {
   emerald: 'bg-emerald-600',
   sky: 'bg-sky-600',
 };
+
+const isSimpleInterest = card.slug === 'interes-simple';
+const isCompoundInterest = content?.illustration === 'compound';
+
+const conceptTitle = content ? `¿Qué es el ${card.title.toLowerCase()}?` : '';
+const formulaTitle = content ? `Fórmula del ${card.title.toLowerCase()}` : '';
+
+const illustrationColors = {
+  ochre: '#b7791f',
+  emerald: '#047857',
+  sky: '#0369a1',
+};
+const illustrationColor = illustrationColors[card.accent] ?? '#b7791f';
+
+const compoundSeries = (() => {
+  const xStart = 52;
+  const xEnd = 332;
+  const yTop = 32;
+  const yBase = 192;
+  const bend = 3;
+  const denominator = Math.exp(bend) - 1;
+
+  const samples = Array.from({ length: 21 }, (_, index) => {
+    const t = index / 20;
+    const growth = (Math.exp(bend * t) - 1) / denominator;
+
+    return {
+      x: xStart + (xEnd - xStart) * t,
+      y: yBase - (yBase - yTop) * growth,
+    };
+  });
+
+  return {
+    curve: samples
+      .map(
+        (point, index) =>
+          `${index === 0 ? 'M' : 'L'}${point.x.toFixed(1)} ${point.y.toFixed(1)}`
+      )
+      .join(' '),
+    area: `${samples
+      .map(
+        (point, index) =>
+          `${index === 0 ? 'M' : 'L'}${point.x.toFixed(1)} ${point.y.toFixed(1)}`
+      )
+      .join(' ')} L${xEnd} ${yBase} L${xStart} ${yBase} Z`,
+    dots: samples.filter((_, index) => index % 4 === 0),
+  };
+})();
+
+const curveEndY = isCompoundInterest ? 32 : 48;
 ---
 
 <!doctype html>
@@ -93,11 +143,15 @@ const dots = {
                 viewBox="0 0 360 230"
                 class="h-auto w-full"
                 role="img"
-                aria-label="El monto crece en línea recta a medida que pasa el tiempo"
+                aria-label={content.figureLabel}
               >
                 <path
-                  d="M52 192 L332 48 L332 192 Z"
-                  fill="#b7791f"
+                  d={
+                    isCompoundInterest
+                      ? compoundSeries.area
+                      : 'M52 192 L332 48 L332 192 Z'
+                  }
+                  fill={illustrationColor}
                   fill-opacity="0.08"
                 />
 
@@ -127,36 +181,49 @@ const dots = {
                 />
                 <line
                   x1="332"
-                  y1="48"
+                  y1={curveEndY}
                   x2="332"
                   y2="192"
-                  stroke="#b7791f"
+                  stroke={illustrationColor}
                   stroke-opacity="0.3"
                   stroke-dasharray="3 4"
                 />
 
-                <line
-                  x1="52"
-                  y1="192"
-                  x2="332"
-                  y2="48"
-                  stroke="#b7791f"
+                <path
+                  d={
+                    isCompoundInterest
+                      ? compoundSeries.curve
+                      : 'M52 192 L332 48'
+                  }
+                  fill="none"
+                  stroke={illustrationColor}
                   stroke-width="2.5"
                   stroke-linecap="round"
+                  stroke-linejoin="round"
                 />
 
-                <g fill="#b7791f">
-                  <circle cx="52" cy="192" r="4" />
-                  <circle cx="108" cy="163.2" r="4" />
-                  <circle cx="164" cy="134.4" r="4" />
-                  <circle cx="220" cy="105.6" r="4" />
-                  <circle cx="276" cy="76.8" r="4" />
-                  <circle cx="332" cy="48" r="4" />
-                </g>
+                {isCompoundInterest ? (
+                  <g fill={illustrationColor}>
+                    {compoundSeries.dots.map((point) => (
+                      <circle cx={point.x} cy={point.y} r="4" />
+                    ))}
+                  </g>
+                ) : (
+                  <g fill={illustrationColor}>
+                    <circle cx="52" cy="192" r="4" />
+                    <circle cx="108" cy="163.2" r="4" />
+                    <circle cx="164" cy="134.4" r="4" />
+                    <circle cx="220" cy="105.6" r="4" />
+                    <circle cx="276" cy="76.8" r="4" />
+                    <circle cx="332" cy="48" r="4" />
+                  </g>
+                )}
 
                 <g fill="#10231c" font-size="13">
                   <text x="42" y="196" text-anchor="end">C</text>
-                  <text x="42" y="52" text-anchor="end">C + I</text>
+                  <text x="42" y={isCompoundInterest ? 38 : 52} text-anchor="end">
+                    {isCompoundInterest ? 'M' : 'C + I'}
+                  </text>
                 </g>
                 <text
                   x="332"
@@ -229,7 +296,7 @@ const dots = {
                       id="que-es"
                       class="font-display text-3xl tracking-[-0.01em] text-ink"
                     >
-                      ¿Qué es el interés simple?
+                      {conceptTitle}
                     </h2>
 
                     <div
@@ -266,7 +333,7 @@ const dots = {
                             class="h-px w-6 shrink-0 bg-ochre"
                             aria-hidden="true"
                           />
-                          Fórmula del interés simple
+                          {formulaTitle}
                         </h2>
 
                         <p
@@ -323,7 +390,30 @@ const dots = {
                 hidden
                 class="lg:col-span-3"
               >
-                <SimpleInterestCalculator />
+                {isSimpleInterest ? (
+                  <SimpleInterestCalculator />
+                ) : (
+                  <section
+                    class="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-16 text-center sm:px-10"
+                  >
+                    <p class="font-display text-2xl text-ink">
+                      Ejercicios en preparación
+                    </p>
+                    <p
+                      class="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600"
+                    >
+                      Estamos preparando los ejercicios de{' '}
+                      {card.title.toLowerCase()}. Mientras tanto, podés repasar
+                      el concepto en la pestaña anterior.
+                    </p>
+                    <a
+                      href="/#catalogo"
+                      class="mt-7 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                    >
+                      Volver al catálogo
+                    </a>
+                  </section>
+                )}
               </div>
             </>
           ) : (

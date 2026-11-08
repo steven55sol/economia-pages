@@ -32,5 +32,43 @@ export const topicContent = {
         description: 'La cantidad de períodos de la operación. La tasa y el tiempo deben expresarse en la misma unidad.',
       },
     ],
+    figureLabel: 'El monto crece en línea recta a medida que pasa el tiempo',
+    illustration: 'linear',
+  },
+  'interes-compuesto': {
+    lead: 'Los intereses se suman al capital y generan nuevos intereses. Por eso, el monto crece cada vez más rápido.',
+    whatIs: [
+      'El interés compuesto es la ganancia que produce un capital cuando los intereses de cada período se suman al capital. Así, el nuevo monto también genera intereses en los períodos siguientes.',
+      'Este proceso se llama capitalización. A diferencia del interés simple, el monto no crece en línea recta: se acelera con el tiempo, porque cada período se calcula sobre un capital mayor.',
+    ],
+    example: '$1.000 al 10% anual se convierten en $1.100 al año, $1.210 a los dos años y $1.331 a los tres.',
+    formula: {
+      expression: 'M = C · (1 + i)ⁿ',
+      note: 'Cada período los intereses se incorporan al capital, por eso la tasa se aplica sobre un monto cada vez mayor.',
+    },
+    symbols: [
+      {
+        symbol: 'M',
+        name: 'Monto final',
+        description: 'El capital inicial más todos los intereses acumulados al final de la operación.',
+      },
+      {
+        symbol: 'C',
+        name: 'Capital inicial',
+        description: 'El dinero que se invierte o se presta al comienzo de la operación.',
+      },
+      {
+        symbol: 'i',
+        name: 'Tasa de interés',
+        description: 'El porcentaje que se aplica en cada período de capitalización, expresado en decimal. Por ejemplo, 10% = 0,10.',
+      },
+      {
+        symbol: 'n',
+        name: 'Períodos',
+        description: 'La cantidad de períodos de capitalización. La tasa y el tiempo deben expresarse en la misma unidad.',
+      },
+    ],
+    figureLabel: 'El monto crece de forma acelerada porque los intereses se capitalizan',
+    illustration: 'compound',
   },
 };
