@@ -96,6 +96,13 @@ const fieldValue = (value, options) => {
     >
       {initialExercise?.statement}
     </p>
+    <p
+      data-exercise-note
+      class="mt-3 max-w-3xl text-sm leading-6 text-slate-600"
+      hidden={!initialExercise?.note}
+    >
+      {initialExercise?.note ?? ''}
+    </p>
   </div>
 
   <div class="mt-8 grid items-start gap-8 lg:grid-cols-2">
@@ -549,6 +556,7 @@ const fieldValue = (value, options) => {
     solveExercise,
     timeToYears,
     toAnnualRate,
+    fromAnnualRate,
   } from '../scripts/simple-interest.js';
   import {
     buildChartData,
@@ -568,6 +576,7 @@ const fieldValue = (value, options) => {
     const exerciseSelect = root.querySelector('[data-exercise-select]');
     const exerciseHeading = root.querySelector('[data-exercise-heading]');
     const exerciseStatement = root.querySelector('[data-exercise-statement]');
+    const exerciseNote = root.querySelector('[data-exercise-note]');
     const fields = {
       I: root.querySelector('[data-field="I"]'),
       C: root.querySelector('[data-field="C"]'),
@@ -637,6 +646,7 @@ const fieldValue = (value, options) => {
       hasCalculated: false,
       charts: null,
       activeChart: 'composition',
+      rateType: rateTypeSelect.value,
     };
 
     function initialTargetValue() {
@@ -648,19 +658,19 @@ const fieldValue = (value, options) => {
       return normalizeYearDays(selected?.value);
     }
 
-    function getFormValues() {
-      const readField = (fieldName) => {
-        const field = fields[fieldName];
-        const precise = field?.dataset.preciseValue;
-        return precise ? precise : field.value;
-      };
+    function readFieldValue(fieldName) {
+      const field = fields[fieldName];
+      if (!field) return '';
+      return field.dataset.preciseValue ?? field.value;
+    }
 
+    function getFormValues() {
       return {
         target: state.target,
-        I: readField('I'),
-        C: readField('C'),
-        i: readField('i'),
-        n: readField('n'),
+        I: readFieldValue('I'),
+        C: readFieldValue('C'),
+        i: readFieldValue('i'),
+        n: readFieldValue('n'),
         timeUnit: timeUnitSelect.value,
         rateType: rateTypeSelect.value,
         yearDays: getYearDays(),
@@ -683,12 +693,20 @@ const fieldValue = (value, options) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     };
-    const rateInputOptions = {
+    const rateResultOptions = {
       minimumFractionDigits: 0,
       maximumFractionDigits: 1,
     };
+    const timeResultOptions = {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 4,
+    };
+    const rateConversionOptions = {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+    };
 
-    function setFieldValue(fieldName, value) {
+    function setFieldValue(fieldName, value, options) {
       const field = fields[fieldName];
       if (!field) return;
 
@@ -702,13 +720,9 @@ const fieldValue = (value, options) => {
       if (Number.isFinite(parsed)) {
         field.value = formatInputNumber(
           parsed,
-          moneyFields.has(fieldName)
-            ? moneyInputOptions
-            : fieldName === 'i'
-              ? rateInputOptions
-              : undefined
+          options ?? (moneyFields.has(fieldName) ? moneyInputOptions : undefined)
         );
-        field.dataset.preciseValue = String(parsed);
+        field.dataset.preciseValue = String(parsed).replace('.', ',');
         return;
       }
 
@@ -723,6 +737,7 @@ const fieldValue = (value, options) => {
       setFieldValue('n', values.n);
       timeUnitSelect.value = values.timeUnit ?? 'meses';
       rateTypeSelect.value = values.rateType ?? 'anual';
+      state.rateType = rateTypeSelect.value;
       const yearDays = normalizeYearDays(values.yearDays);
       yearDaysInputs.forEach((input) => {
         input.checked = Number(input.value) === yearDays;
@@ -815,9 +830,25 @@ const fieldValue = (value, options) => {
       staleNotice.hidden = true;
     }
 
+    function convertRateType(nextType) {
+      if (!RATE_TYPES[nextType]) return;
+
+      const previousType = state.rateType;
+      state.rateType = nextType;
+      if (!previousType || previousType === nextType) return;
+
+      const current = parseNumber(readFieldValue('i'));
+      if (!Number.isFinite(current) || current <= 0) return;
+
+      const yearDays = getYearDays();
+      const annual = toAnnualRate(current, previousType, yearDays);
+      const converted = fromAnnualRate(annual, nextType, yearDays);
+      setFieldValue('i', converted, rateConversionOptions);
+    }
+
     function updateConversions() {
-      const n = parseNumber(fields.n.value);
-      const i = parseNumber(fields.i.value);
+      const n = parseNumber(readFieldValue('n'));
+      const i = parseNumber(readFieldValue('i'));
       const yearDays = getYearDays();
       const timeUnit = timeUnitSelect.value;
       const rateType = rateTypeSelect.value;
@@ -838,7 +869,7 @@ const fieldValue = (value, options) => {
 
       if (Number.isFinite(i) && i > 0) {
         const annual = toAnnualRate(i, rateType, yearDays);
-        conversionRate.textContent = `${formatPercent(i, 1)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
+        conversionRate.textContent = `${formatPercent(i, state.target === 'i' ? 1 : 2)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 6)} anual.`;
       } else {
         conversionRate.textContent = 'Ingresá una tasa para ver la conversión.';
       }
@@ -882,12 +913,12 @@ const fieldValue = (value, options) => {
         ['Interés', formatMoney(result.summary.interest)],
         ['Capital inicial', formatMoney(result.summary.capital)],
         ['Monto total', formatMoney(result.summary.total)],
-        ['Tasa', `${formatPercent(result.values.i, 1)} ${rateLabel}`],
+        ['Tasa', `${formatPercent(result.values.i, result.target === 'i' ? 1 : 2)} ${rateLabel}`],
         ['Tiempo', `${formatNumber(result.values.n, 4)} ${timeLabel}`],
         ['Base de días', `${result.yearDays} días`],
         ['Tiempo en años', `${formatNumber(result.conversions.nYears, 4)} años`],
         ['Tiempo en días', `${formatNumber(result.conversions.nDays, 2)} días`],
-        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, 1)],
+        ['Tasa anual equivalente', formatPercent(result.conversions.iAnnual * 100, result.target === 'i' ? 1 : 2)],
         ['Tasa anual decimal', formatNumber(result.conversions.iAnnual, 6)],
       ];
 
@@ -1040,7 +1071,15 @@ const fieldValue = (value, options) => {
       updateChartEmptyState(false);
       renderResult(result);
 
-      setFieldValue(result.target, result.result.value);
+      setFieldValue(
+        result.target,
+        result.result.value,
+        result.target === 'i'
+          ? rateResultOptions
+          : result.target === 'n'
+            ? timeResultOptions
+            : undefined
+      );
 
       updateConversions();
       updateChartsIfReady(result);
@@ -1059,6 +1098,8 @@ const fieldValue = (value, options) => {
       state.currentSnapshot = snapshot;
       exerciseHeading.textContent = snapshot.title;
       exerciseStatement.textContent = snapshot.statement;
+      exerciseNote.textContent = snapshot.note ?? '';
+      exerciseNote.hidden = !snapshot.note;
       syncExerciseSelect(snapshot.presetId);
       setTarget(snapshot.target ?? 'I');
       setFields({
@@ -1090,6 +1131,7 @@ const fieldValue = (value, options) => {
         presetId: exercise.id,
         title: exercise.title,
         statement: exercise.statement,
+        note: exercise.note ?? null,
         values: { ...exercise.data },
         target: exercise.target,
         timeUnit: exercise.data.timeUnit,
@@ -1117,7 +1159,9 @@ const fieldValue = (value, options) => {
     function clearExercise() {
       Object.values(fields).forEach((field) => {
         field.value = '';
+        delete field.dataset.preciseValue;
       });
+      state.rateType = rateTypeSelect.value;
       state.lastResult = null;
       state.hasCalculated = false;
       clearErrors();
@@ -1260,11 +1304,13 @@ const fieldValue = (value, options) => {
     });
 
     form.addEventListener('change', (event) => {
-      if (
-        event.target.matches(
-          '[data-time-unit], [data-rate-type], [data-year-days]'
-        )
-      ) {
+      if (event.target.matches('[data-rate-type]')) {
+        convertRateType(event.target.value);
+        updateConversions();
+        showStale();
+        return;
+      }
+      if (event.target.matches('[data-time-unit], [data-year-days]')) {
         updateConversions();
         showStale();
       }

@@ -220,9 +220,10 @@ function buildSteps({
 }) {
   const rateLabel = RATE_TYPES[rateType].label;
   const timeLabel = TIME_UNITS[timeUnit].label;
+  const rateDecimals = target === 'i' ? 1 : 2;
   const steps = [];
 
-  const rateLine = `Tasa: ${formatPercent(iPercent, 1)} ${rateLabel} = ${formatNumber(iAnnual, 8)} anual.`;
+  const rateLine = `Tasa: ${formatPercent(iPercent, rateDecimals)} ${rateLabel} = ${formatNumber(iAnnual, 8)} anual.`;
   let timeLine = `Tiempo: ${formatNumber(nValue, 4)} ${timeLabel} = ${formatNumber(nYears, 8)} años = ${formatNumber(nDays, 4)} días (base ${yearDays}).`;
   if (yearDays === 360) {
     timeLine += ` Equivalencia calendario: ${formatNumber(nCalendarDays, 2)} días.`;

@@ -195,7 +195,9 @@ function buildRatesData(result) {
 
   return {
     rates,
-    labels: rates.map((rate) => formatPercent(rate, 1)),
+    labels: rates.map((rate) =>
+      formatPercent(rate, result.target === 'i' ? 1 : 2)
+    ),
     values: rates.map(
       (rate) => capital * ((rate / 100) * factor) * nYears
     ),
