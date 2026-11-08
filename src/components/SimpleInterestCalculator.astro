@@ -1,10 +1,9 @@
 ---
-import {
-  simpleInterestExercises,
-} from '../data/exercises.js';
+import {simpleInterestExercises,} from '../data/exercises.js';
 import {
   formatInputNumber,
   parseNumber,
+  MOVEMENT_TYPES,
 } from '../scripts/simple-interest.js';
 
 const exercises = simpleInterestExercises;
@@ -12,6 +11,7 @@ const initialExercise = exercises[0];
 const initialTarget = initialExercise?.target ?? 'C';
 const initialYearDays = initialExercise?.yearDays ?? 360;
 const initialValues = initialExercise?.data ?? {};
+const movementTypes = Object.entries(MOVEMENT_TYPES);
 
 const inputBoxClass =
   'mt-2 flex items-center overflow-hidden rounded-lg border border-slate-300 bg-white transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20 data-[invalid=true]:border-red-400 data-[invalid=true]:ring-2 data-[invalid=true]:ring-red-100 data-[target=true]:border-ochre data-[target=true]:bg-[#fdf9f0]';
@@ -114,12 +114,12 @@ const fieldValue = (value, options) => {
         </p>
       </div>
 
-      <form data-calculator-form class="px-5 py-6 sm:px-6" novalidate>
+      <form data-calculator-form data-normal-panel class="px-5 py-6 sm:px-6" novalidate>
         <fieldset>
           <legend class="text-sm font-semibold text-slate-900">
             ¿Qué querés calcular?
           </legend>
-          <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-label="Variable a calcular">
+          <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5" role="group" aria-label="Variable a calcular">
             <button
               type="button"
               data-target-option="I"
@@ -135,6 +135,14 @@ const fieldValue = (value, options) => {
               class={targetButtonClass}
             >
               Capital
+            </button>
+            <button
+              type="button"
+              data-target-option="M"
+              aria-pressed={initialTarget === 'M' ? 'true' : 'false'}
+              class={targetButtonClass}
+            >
+              Monto
             </button>
             <button
               type="button"
@@ -215,6 +223,34 @@ const fieldValue = (value, options) => {
               />
             </div>
             <p id="si-error-C" data-error="C" class="mt-1.5 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between gap-2">
+              <label for="si-M" class={fieldLabelClass}>Monto final (M)</label>
+              <span data-target-badge="M" hidden={initialTarget !== 'M'} class="text-xs font-semibold text-ochre">
+                Se calcula
+              </span>
+            </div>
+            <div
+              data-target-box="M"
+              data-target={initialTarget === 'M' ? 'true' : 'false'}
+              class={inputBoxClass}
+            >
+              <span class="pl-3 text-sm text-slate-500" aria-hidden="true">US$</span>
+              <input
+                id="si-M"
+                data-field="M"
+                value={fieldValue(initialValues.M, moneyInputOptions)}
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0"
+                aria-describedby="si-error-M"
+                class={inputClass}
+              />
+            </div>
+            <p id="si-error-M" data-error="M" class="mt-1.5 hidden text-xs text-red-600"></p>
           </div>
 
           <div>
@@ -384,10 +420,242 @@ const fieldValue = (value, options) => {
           <p data-action-status role="status" aria-live="polite" class="min-h-5 text-xs text-slate-500"></p>
         </div>
       </form>
+
+      <form data-focal-form data-focal-panel hidden class="px-5 py-6 sm:px-6" novalidate>
+        <fieldset>
+          <legend class="text-sm font-semibold text-slate-900">
+            Ecuación de valor con fecha focal
+          </legend>
+          <p class="mt-1 text-xs leading-5 text-slate-500">
+            Cada cantidad se traslada a la fecha focal con interés simple: se capitaliza si está antes y se descuenta si está después.
+          </p>
+
+          <div class="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="sf-rate" class={fieldLabelClass}>Tasa (i)</label>
+              <div class={`${inputBoxClass} mt-2`}>
+                <input
+                  id="sf-rate"
+                  data-focal-rate
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="0"
+                  aria-describedby="sf-error-rate"
+                  class={inputClass}
+                />
+                <span class="pr-3 text-sm text-slate-500" aria-hidden="true">%</span>
+              </div>
+              <p id="sf-error-rate" data-focal-error="rate" class="mt-1.5 hidden text-xs text-red-600"></p>
+            </div>
+
+            <div>
+              <label for="sf-rate-type" class={fieldLabelClass}>Tipo de tasa</label>
+              <select id="sf-rate-type" data-focal-rate-type class={`${selectClass} mt-2`}>
+                <option value="anual">Anual</option>
+                <option value="mensual">Mensual</option>
+                <option value="semanal">Semanal</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="sf-focal-date" class={fieldLabelClass}>Fecha focal</label>
+              <input
+                id="sf-focal-date"
+                data-focal-date
+                type="date"
+                aria-describedby="sf-error-focal-date"
+                class={`${selectClass} mt-2`}
+              />
+              <p id="sf-error-focal-date" data-focal-error="focalDate" class="mt-1.5 hidden text-xs text-red-600"></p>
+            </div>
+
+            <fieldset>
+              <legend class={fieldLabelClass}>Base de días</legend>
+              <div class="mt-2 grid grid-cols-2 gap-2">
+                <label class="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="sf-year-days"
+                    value="360"
+                    data-focal-year-days
+                    checked
+                    class="peer sr-only"
+                  />
+                  <span class="block rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-slate-600 transition peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-600 peer-focus-visible:ring-offset-2">
+                    360 comercial
+                  </span>
+                </label>
+                <label class="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="sf-year-days"
+                    value="365"
+                    data-focal-year-days
+                    class="peer sr-only"
+                  />
+                  <span class="block rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-center text-xs font-semibold text-slate-600 transition peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-600 peer-focus-visible:ring-offset-2">
+                    365 calendario
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+        </fieldset>
+
+        <div class="mt-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h4 class="text-sm font-semibold text-slate-900">Movimientos</h4>
+              <p class="mt-1 text-xs text-slate-500">
+                Agregá obligaciones, pagos, inversiones o recepciones. Marcá una sola incógnita.
+              </p>
+            </div>
+            <button type="button" data-add-movement class={secondaryButtonClass}>
+              + Agregar movimiento
+            </button>
+          </div>
+          <div data-focal-movements class="mt-3 space-y-3"></div>
+          <p data-focal-error="movements" class="mt-1.5 hidden text-xs text-red-600"></p>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-4 py-4">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Conversión automática
+          </p>
+          <dl class="mt-3 space-y-2 text-sm">
+            <div class="flex gap-2">
+              <dt class="w-16 shrink-0 text-slate-500">Tasa</dt>
+              <dd data-focal-conversion-rate class="text-slate-700">—</dd>
+            </div>
+            <div class="flex gap-2">
+              <dt class="w-16 shrink-0 text-slate-500">Períodos</dt>
+              <dd data-focal-conversion-periods class="text-slate-700">—</dd>
+            </div>
+          </dl>
+        </div>
+
+        <p
+          data-focal-error="general"
+          class="mt-4 hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        ></p>
+
+        <p
+          data-focal-stale
+          hidden
+          class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900"
+        >
+          Los datos cambiaron. Presioná Calcular para actualizar la resolución.
+        </p>
+
+        <div
+          data-focal-error-summary
+          hidden
+          role="alert"
+          class="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <p class="font-semibold">Revisá los datos:</p>
+          <ul data-focal-error-list class="mt-1 list-inside list-disc"></ul>
+        </div>
+
+        <div class="mt-6 grid gap-2">
+          <button
+            type="submit"
+            class="inline-flex w-full items-center justify-center rounded-lg bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+          >
+            Calcular
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" data-focal-action="reset" class={secondaryButtonClass}>
+              Restablecer
+            </button>
+            <button type="button" data-focal-action="clear" class={secondaryButtonClass}>
+              Limpiar
+            </button>
+          </div>
+          <button
+            type="button"
+            data-focal-action="export"
+            class="rounded-lg bg-[#8a5a12] px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#744c0f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a12] focus-visible:ring-offset-2"
+          >
+            Exportar Excel (CSV)
+          </button>
+          <p data-focal-action-status role="status" aria-live="polite" class="min-h-5 text-xs text-slate-500"></p>
+        </div>
+      </form>
+
+      <template data-movement-template>
+        <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3" data-movement>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="flex items-center justify-between gap-2 sm:col-span-2">
+              <span class="text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                Movimiento
+              </span>
+              <button
+                type="button"
+                data-remove-movement
+                class="text-xs font-semibold text-red-600 transition hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+              >
+                Eliminar
+              </button>
+            </div>
+
+            <label class="text-xs font-medium text-slate-600">
+              Tipo
+              <select data-movement-type class={`${selectClass} mt-1`}>
+                {movementTypes.map(([value, config]) => (
+                  <option value={value}>{config.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label class="text-xs font-medium text-slate-600">
+              Fecha
+              <input
+                type="date"
+                data-movement-date
+                class={`${selectClass} mt-1`}
+              />
+            </label>
+
+            <label class="text-xs font-medium text-slate-600">
+              Valor
+              <span class="mt-1 flex items-center overflow-hidden rounded-lg border border-slate-300 bg-white transition focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600/20">
+                <span class="pl-3 text-xs text-slate-500" aria-hidden="true">US$</span>
+                <input
+                  data-movement-amount
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  placeholder="0"
+                  class="w-full border-0 bg-transparent px-2 py-2.5 text-sm tabular-nums text-ink outline-none placeholder:text-slate-400 disabled:bg-slate-100 disabled:text-slate-400"
+                />
+              </span>
+            </label>
+
+            <label class="flex items-center gap-2 self-end rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-xs font-medium text-slate-600">
+              <input type="checkbox" data-movement-unknown class="h-4 w-4 accent-emerald-700" />
+              Es la incógnita
+            </label>
+
+            <label class="text-xs font-medium text-slate-600 sm:col-span-2">
+              Descripción (opcional)
+              <input
+                type="text"
+                data-movement-description
+                autocomplete="off"
+                placeholder="Ej.: préstamo, pago inicial, recepción…"
+                class={`${selectClass} mt-1`}
+              />
+            </label>
+          </div>
+          <p data-movement-error class="mt-2 hidden text-xs text-red-600"></p>
+        </div>
+      </template>
     </div>
 
     <div class="lg:sticky lg:top-24">
-      <div class="rounded-2xl border border-slate-200 bg-white">
+      <div data-chart-card class="rounded-2xl border border-slate-200 bg-white">
         <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <h3 class="font-display text-2xl text-ink">Gráfica</h3>
@@ -450,6 +718,22 @@ const fieldValue = (value, options) => {
                 <div data-chart-table="rates" class="mt-3 overflow-x-auto"></div>
               </details>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-timeline-card hidden class="rounded-2xl border border-slate-200 bg-white">
+        <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
+          <h3 class="font-display text-2xl text-ink">Línea de tiempo</h3>
+          <p class="mt-1 text-sm text-slate-500">
+            Se actualiza automáticamente al cambiar fechas, importes, tasa o fecha focal.
+          </p>
+        </div>
+        <div class="px-4 py-5 sm:px-6">
+          <div data-timeline></div>
+          <div class="mt-4 space-y-1 text-xs leading-5 text-slate-500">
+            <p>Flecha continua: capitalización hacia la fecha focal.</p>
+            <p>Flecha discontinua: descuento desde una fecha posterior.</p>
           </div>
         </div>
       </div>
@@ -530,6 +814,89 @@ const fieldValue = (value, options) => {
     </div>
   </section>
 
+  <section data-focal-results hidden class="mt-12">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="flex items-center gap-2.5 text-sm font-semibold text-slate-700">
+          <span class="h-px w-6 bg-ochre" aria-hidden="true"></span>
+          Resolución
+        </p>
+        <h3 class="mt-2 font-display text-3xl tracking-[-0.01em] text-ink sm:text-4xl">
+          Ecuación de valor
+        </h3>
+      </div>
+      <p data-focal-results-target class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+        Valor de la incógnita
+      </p>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+      <div class="space-y-4">
+        <div class="rounded-2xl bg-ink px-6 py-7 text-white">
+          <p data-focal-result-label class="text-sm text-emerald-200">Valor de la incógnita</p>
+          <p data-focal-result-value class="mt-2 font-display text-4xl leading-none tracking-[-0.02em] sm:text-5xl">
+            —
+          </p>
+          <p data-focal-result-note class="mt-4 max-w-sm text-sm leading-6 text-slate-300"></p>
+        </div>
+
+        <dl class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Obligaciones e inversiones</dt>
+            <dd data-focal-summary-a class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Pagos y recepciones</dt>
+            <dd data-focal-summary-b class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Diferencia (B − A)</dt>
+            <dd data-focal-summary-diff class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+          <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+            <dt class="text-sm text-slate-500">Fecha focal</dt>
+            <dd data-focal-summary-date class="text-sm font-semibold tabular-nums text-ink">—</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Ecuación de valor
+          </p>
+          <p data-focal-equation class="mt-3 overflow-x-auto font-display text-lg leading-7 italic text-ink">
+            —
+          </p>
+          <p data-focal-equation-values class="mt-2 overflow-x-auto text-sm leading-6 text-slate-600">
+            —
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Desarrollo de la ecuación
+          </p>
+          <ol data-focal-development class="mt-3 space-y-2.5 text-sm leading-6 text-slate-600"></ol>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Procedimiento
+          </p>
+          <ol data-focal-steps class="mt-3 space-y-2.5 text-sm leading-6 text-slate-600"></ol>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white px-5 py-5">
+          <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Traslado a la fecha focal
+          </p>
+          <div data-focal-movement-table class="mt-3 overflow-x-auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div data-results-empty class="mt-12 rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-12 text-center">
     <p class="font-display text-2xl text-ink">
       Completá los datos y presioná Calcular
@@ -542,10 +909,13 @@ const fieldValue = (value, options) => {
 </section>
 
 <script>
+  // @ts-nocheck
   import {
     RATE_TYPES,
     TARGETS,
     TIME_UNITS,
+    MOVEMENT_TYPES,
+    buildSimpleTimeline,
     formatInputNumber,
     formatMoney,
     formatNumber,
@@ -554,6 +924,7 @@ const fieldValue = (value, options) => {
     normalizeYearDays,
     parseNumber,
     solveExercise,
+    solveFocalSimple,
     timeToYears,
     toAnnualRate,
     fromAnnualRate,
@@ -564,6 +935,7 @@ const fieldValue = (value, options) => {
     resizeCharts,
     updateCharts,
   } from '../scripts/simple-interest-charts.js';
+  import { renderFinancialTimeline } from '../scripts/financial-timeline.js';
   import { simpleInterestExercises } from '../data/exercises.js';
 
   const root = document.querySelector('[data-simple-interest-calculator]');
@@ -580,6 +952,7 @@ const fieldValue = (value, options) => {
     const fields = {
       I: root.querySelector('[data-field="I"]'),
       C: root.querySelector('[data-field="C"]'),
+      M: root.querySelector('[data-field="M"]'),
       i: root.querySelector('[data-field="i"]'),
       n: root.querySelector('[data-field="n"]'),
     };
@@ -590,12 +963,14 @@ const fieldValue = (value, options) => {
     const targetBoxes = {
       I: root.querySelector('[data-target-box="I"]'),
       C: root.querySelector('[data-target-box="C"]'),
+      M: root.querySelector('[data-target-box="M"]'),
       i: root.querySelector('[data-target-box="i"]'),
       n: root.querySelector('[data-target-box="n"]'),
     };
     const targetBadges = {
       I: root.querySelector('[data-target-badge="I"]'),
       C: root.querySelector('[data-target-badge="C"]'),
+      M: root.querySelector('[data-target-badge="M"]'),
       i: root.querySelector('[data-target-badge="i"]'),
       n: root.querySelector('[data-target-badge="n"]'),
     };
@@ -604,6 +979,7 @@ const fieldValue = (value, options) => {
     const errorElements = {
       I: root.querySelector('[data-error="I"]'),
       C: root.querySelector('[data-error="C"]'),
+      M: root.querySelector('[data-error="M"]'),
       i: root.querySelector('[data-error="i"]'),
       n: root.querySelector('[data-error="n"]'),
     };
@@ -638,8 +1014,51 @@ const fieldValue = (value, options) => {
       rates: root.querySelector('[data-chart-table="rates"]'),
     };
 
+    const normalPanel = root.querySelector('[data-normal-panel]');
+    const focalPanel = root.querySelector('[data-focal-panel]');
+    const chartCard = root.querySelector('[data-chart-card]');
+    const timelineCard = root.querySelector('[data-timeline-card]');
+    const timelineContainer = root.querySelector('[data-timeline]');
+    const focalForm = root.querySelector('[data-focal-form]');
+    const focalRateInput = root.querySelector('[data-focal-rate]');
+    const focalRateTypeSelect = root.querySelector('[data-focal-rate-type]');
+    const focalDateInput = root.querySelector('[data-focal-date]');
+    const focalYearDaysInputs = [
+      ...root.querySelectorAll('[data-focal-year-days]'),
+    ];
+    const focalMovementsContainer = root.querySelector('[data-focal-movements]');
+    const movementTemplate = root.querySelector('[data-movement-template]');
+    const addMovementButton = root.querySelector('[data-add-movement]');
+    const focalConversionRate = root.querySelector('[data-focal-conversion-rate]');
+    const focalConversionPeriods = root.querySelector('[data-focal-conversion-periods]');
+    const focalStaleNotice = root.querySelector('[data-focal-stale]');
+    const focalErrorSummary = root.querySelector('[data-focal-error-summary]');
+    const focalErrorList = root.querySelector('[data-focal-error-list]');
+    const focalErrorElements = {
+      rate: root.querySelector('[data-focal-error="rate"]'),
+      focalDate: root.querySelector('[data-focal-error="focalDate"]'),
+      movements: root.querySelector('[data-focal-error="movements"]'),
+      general: root.querySelector('[data-focal-error="general"]'),
+    };
+    const focalActionStatus = root.querySelector('[data-focal-action-status]');
+    const focalResults = root.querySelector('[data-focal-results]');
+    const focalResultsTarget = root.querySelector('[data-focal-results-target]');
+    const focalResultLabel = root.querySelector('[data-focal-result-label]');
+    const focalResultValue = root.querySelector('[data-focal-result-value]');
+    const focalResultNote = root.querySelector('[data-focal-result-note]');
+    const focalSummaryA = root.querySelector('[data-focal-summary-a]');
+    const focalSummaryB = root.querySelector('[data-focal-summary-b]');
+    const focalSummaryDiff = root.querySelector('[data-focal-summary-diff]');
+    const focalSummaryDate = root.querySelector('[data-focal-summary-date]');
+    const focalEquation = root.querySelector('[data-focal-equation]');
+    const focalEquationValues = root.querySelector('[data-focal-equation-values]');
+    const focalDevelopment = root.querySelector('[data-focal-development]');
+    const focalSteps = root.querySelector('[data-focal-steps]');
+    const focalMovementTable = root.querySelector('[data-focal-movement-table]');
+
     const state = {
       target: initialTargetValue(),
+      mode: 'normal',
       baseline: null,
       currentSnapshot: null,
       lastResult: null,
@@ -647,6 +1066,12 @@ const fieldValue = (value, options) => {
       charts: null,
       activeChart: 'composition',
       rateType: rateTypeSelect.value,
+      focalBaseline: null,
+      focalSnapshot: null,
+      lastFocalResult: null,
+      hasCalculatedFocal: false,
+      movementSeq: 0,
+      focalRateType: focalRateTypeSelect.value,
     };
 
     function initialTargetValue() {
@@ -669,6 +1094,7 @@ const fieldValue = (value, options) => {
         target: state.target,
         I: readFieldValue('I'),
         C: readFieldValue('C'),
+        M: readFieldValue('M'),
         i: readFieldValue('i'),
         n: readFieldValue('n'),
         timeUnit: timeUnitSelect.value,
@@ -688,7 +1114,7 @@ const fieldValue = (value, options) => {
       });
     }
 
-    const moneyFields = new Set(['I', 'C']);
+    const moneyFields = new Set(['I', 'C', 'M']);
     const moneyInputOptions = {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
@@ -733,6 +1159,7 @@ const fieldValue = (value, options) => {
     function setFields(values) {
       setFieldValue('I', values.I);
       setFieldValue('C', values.C);
+      setFieldValue('M', values.M);
       setFieldValue('i', values.i);
       setFieldValue('n', values.n);
       timeUnitSelect.value = values.timeUnit ?? 'meses';
@@ -885,11 +1312,13 @@ const fieldValue = (value, options) => {
       resultNote.textContent =
         result.target === 'C'
           ? 'Capital necesario para generar los intereses indicados con esa tasa y ese tiempo.'
-          : result.target === 'I'
-            ? 'Interés generado por el capital durante el tiempo indicado.'
-            : result.target === 'i'
-              ? `Tasa ${rateLabel} equivalente al interés del ejercicio.`
-              : 'Tiempo necesario para generar el interés indicado.';
+          : result.target === 'M'
+            ? 'Monto final: capital más los intereses generados durante el tiempo indicado.'
+            : result.target === 'I'
+              ? 'Interés generado por el capital durante el tiempo indicado.'
+              : result.target === 'i'
+                ? `Tasa ${rateLabel} equivalente al interés del ejercicio.`
+                : 'Tiempo necesario para generar el interés indicado.';
 
       summaryInterest.textContent = formatMoney(result.summary.interest);
       summaryCapital.textContent = formatMoney(result.summary.capital);
@@ -1026,6 +1455,7 @@ const fieldValue = (value, options) => {
     }
 
     function ensureCharts() {
+      if (state.mode !== 'normal') return false;
       if (!panelIsVisible()) return false;
       if (state.charts) return true;
 
@@ -1105,6 +1535,7 @@ const fieldValue = (value, options) => {
       setFields({
         I: snapshot.values?.I ?? null,
         C: snapshot.values?.C ?? null,
+        M: snapshot.values?.M ?? null,
         i: snapshot.values?.i ?? null,
         n: snapshot.values?.n ?? null,
         timeUnit: snapshot.timeUnit ?? 'meses',
@@ -1132,21 +1563,35 @@ const fieldValue = (value, options) => {
         title: exercise.title,
         statement: exercise.statement,
         note: exercise.note ?? null,
+        mode: exercise.mode === 'focal' ? 'focal' : 'normal',
         values: { ...exercise.data },
         target: exercise.target,
-        timeUnit: exercise.data.timeUnit,
-        rateType: exercise.data.rateType,
+        timeUnit: exercise.data?.timeUnit,
+        rateType: exercise.data?.rateType,
         yearDays: exercise.yearDays ?? 360,
+        focal: exercise.focal ?? null,
       };
     }
 
     function loadExerciseById(id) {
       const exercise = exercises.find((item) => item.id === id);
-      if (exercise) {
-        const snapshot = snapshotFromExercise(exercise);
-        state.baseline = snapshot;
-        applySnapshot(snapshot);
+      if (!exercise) return;
+
+      const snapshot = snapshotFromExercise(exercise);
+
+      if (snapshot.mode === 'focal') {
+        state.focalBaseline = snapshot;
+        state.lastFocalResult = null;
+        state.hasCalculatedFocal = false;
+        setMode('focal');
+        applyFocalSnapshot(snapshot);
+        return;
       }
+
+      state.baseline = snapshot;
+      setMode('normal');
+      applySnapshot(snapshot);
+      window.requestAnimationFrame(() => resizeCharts(state.charts));
     }
 
     function resetExercise() {
@@ -1168,10 +1613,525 @@ const fieldValue = (value, options) => {
       hideStale();
       updateConversions();
       results.hidden = true;
-      resultsEmpty.hidden = false;
+      if (state.mode === 'normal') resultsEmpty.hidden = false;
       updateChartEmptyState(true);
       setStatus('Formulario limpio.');
       announce('Formulario limpio. Podés completar nuevos datos.');
+    }
+
+    // -----------------------------------------------------------------------
+    // Fecha focal
+    // -----------------------------------------------------------------------
+
+    function setMode(mode) {
+      const focal = mode === 'focal';
+      state.mode = focal ? 'focal' : 'normal';
+      normalPanel.hidden = focal;
+      focalPanel.hidden = !focal;
+      chartCard.hidden = focal;
+      timelineCard.hidden = !focal;
+      results.hidden = true;
+      focalResults.hidden = true;
+      resultsEmpty.hidden = focal
+        ? Boolean(state.lastFocalResult)
+        : Boolean(state.lastResult);
+    }
+
+    function getFocalYearDays() {
+      const selected = focalYearDaysInputs.find((input) => input.checked);
+      return normalizeYearDays(selected?.value);
+    }
+
+    function getFocalMovementRows() {
+      return [...focalMovementsContainer.querySelectorAll('[data-movement]')];
+    }
+
+    function readMovementAmount(row) {
+      const input = row.querySelector('[data-movement-amount]');
+      return input.dataset.preciseValue ?? input.value;
+    }
+
+    function getFocalValues() {
+      return {
+        rate: focalRateInput.dataset.preciseValue ?? focalRateInput.value,
+        rateType: focalRateTypeSelect.value,
+        yearDays: getFocalYearDays(),
+        focalDate: focalDateInput.value,
+        movements: getFocalMovementRows().map((row, index) => ({
+          id: row.dataset.movementId ?? `mov-${index}`,
+          type: row.querySelector('[data-movement-type]').value,
+          date: row.querySelector('[data-movement-date]').value,
+          amount: readMovementAmount(row),
+          description: row.querySelector('[data-movement-description]').value,
+          unknown: row.querySelector('[data-movement-unknown]').checked,
+        })),
+      };
+    }
+
+    function setMovementAmount(row, value) {
+      const input = row.querySelector('[data-movement-amount]');
+      const parsed = parseNumber(value);
+
+      if (Number.isFinite(parsed) && parsed > 0) {
+        input.value = formatInputNumber(parsed, moneyInputOptions);
+        input.dataset.preciseValue = String(parsed).replace('.', ',');
+      } else {
+        input.value = '';
+        delete input.dataset.preciseValue;
+      }
+    }
+
+    function updateFocalUnknownState() {
+      getFocalMovementRows().forEach((row) => {
+        const unknown = row.querySelector('[data-movement-unknown]').checked;
+        const amountInput = row.querySelector('[data-movement-amount]');
+
+        if (unknown) {
+          amountInput.value = '';
+          delete amountInput.dataset.preciseValue;
+        }
+
+        amountInput.disabled = unknown;
+      });
+    }
+
+    function addMovementRow(movement = {}) {
+      state.movementSeq += 1;
+      const fragment = movementTemplate.content.cloneNode(true);
+      const row = fragment.querySelector('[data-movement]');
+      const typeSelect = row.querySelector('[data-movement-type]');
+      const dateInput = row.querySelector('[data-movement-date]');
+      const descriptionInput = row.querySelector('[data-movement-description]');
+      const unknownInput = row.querySelector('[data-movement-unknown]');
+
+      row.dataset.movementId =
+        movement.id ?? `mov-${state.movementSeq}`;
+
+      typeSelect.value = MOVEMENT_TYPES[movement.type]
+        ? movement.type
+        : 'obligacion';
+      dateInput.value = movement.date ?? '';
+      descriptionInput.value = movement.description ?? '';
+      setMovementAmount(row, movement.amount);
+      unknownInput.checked = Boolean(movement.unknown);
+
+      focalMovementsContainer.append(row);
+      updateFocalUnknownState();
+      return row;
+    }
+
+    function renderFocalMovements(movements) {
+      focalMovementsContainer.replaceChildren();
+      const list = Array.isArray(movements) && movements.length > 0
+        ? movements
+        : [{}];
+      list.forEach((movement) => addMovementRow(movement));
+    }
+
+    function setFocalStatus(message) {
+      focalActionStatus.textContent = message;
+    }
+
+    function setFocalFieldValue(value) {
+      const parsed = parseNumber(value);
+      if (Number.isFinite(parsed)) {
+        focalRateInput.value = formatInputNumber(parsed, rateConversionOptions);
+        focalRateInput.dataset.preciseValue = String(parsed).replace('.', ',');
+      } else {
+        focalRateInput.value = '';
+        delete focalRateInput.dataset.preciseValue;
+      }
+    }
+
+    function setFocalFields(focal) {
+      const data = focal ?? {};
+      setFocalFieldValue(data.rate);
+      focalRateTypeSelect.value = RATE_TYPES[data.rateType]
+        ? data.rateType
+        : 'anual';
+      state.focalRateType = focalRateTypeSelect.value;
+      focalDateInput.value = data.focalDate ?? '';
+      const yearDays = normalizeYearDays(data.yearDays ?? 360);
+      focalYearDaysInputs.forEach((input) => {
+        input.checked = Number(input.value) === yearDays;
+      });
+      renderFocalMovements(data.movements);
+      clearFocalErrors();
+      hideFocalStale();
+      setFocalStatus('');
+      updateFocalConversions();
+      updateFocalLive();
+    }
+
+    function clearFocalFieldError(key) {
+      const element = focalErrorElements[key];
+      if (element) {
+        element.textContent = '';
+        element.hidden = true;
+      }
+    }
+
+    function clearFocalErrors() {
+      Object.keys(focalErrorElements).forEach(clearFocalFieldError);
+      getFocalMovementRows().forEach((row) => {
+        const error = row.querySelector('[data-movement-error]');
+        if (error) {
+          error.textContent = '';
+          error.hidden = true;
+        }
+        row.classList.remove('border-red-300', 'bg-red-50/40');
+      });
+      focalErrorSummary.hidden = true;
+      focalErrorList.replaceChildren();
+    }
+
+    function showFocalErrors(errors) {
+      clearFocalErrors();
+      const messages = [];
+
+      Object.entries(errors).forEach(([key, message]) => {
+        if (key.startsWith('movement-')) {
+          const index = Number(key.split('-')[1]);
+          const row = getFocalMovementRows()[index];
+          if (row) {
+            const error = row.querySelector('[data-movement-error]');
+            if (error) {
+              error.textContent = message;
+              error.hidden = false;
+            }
+            row.classList.add('border-red-300', 'bg-red-50/40');
+          }
+        } else {
+          const element = focalErrorElements[key];
+          if (element) {
+            element.textContent = message;
+            element.hidden = false;
+          }
+        }
+        messages.push(message);
+      });
+
+      if (messages.length === 0) return;
+
+      focalErrorList.replaceChildren(
+        ...messages.map((message) => {
+          const item = document.createElement('li');
+          item.textContent = message;
+          return item;
+        })
+      );
+      focalErrorSummary.hidden = false;
+    }
+
+    function showFocalStale() {
+      if (!state.hasCalculatedFocal) return;
+      focalStaleNotice.hidden = false;
+    }
+
+    function hideFocalStale() {
+      focalStaleNotice.hidden = true;
+    }
+
+    function updateFocalConversions() {
+      const rate = parseNumber(focalRateInput.dataset.preciseValue ?? focalRateInput.value);
+      const rateType = focalRateTypeSelect.value;
+      const yearDays = getFocalYearDays();
+
+      if (Number.isFinite(rate) && rate > 0) {
+        const annual = toAnnualRate(rate, rateType, yearDays);
+        focalConversionRate.textContent = `${formatPercent(rate, 4)} ${RATE_TYPES[rateType].label} = ${formatNumber(annual, 8)} anual.`;
+      } else {
+        focalConversionRate.textContent = 'Ingresá una tasa para ver la conversión.';
+      }
+
+      focalConversionPeriods.textContent = `Base ${yearDays} días: n = días ÷ ${yearDays} (años).`;
+    }
+
+    function updateFocalLive() {
+      updateFocalConversions();
+      const values = getFocalValues();
+
+      if (!values.focalDate) {
+        renderFinancialTimeline(timelineContainer, { ok: false });
+        return;
+      }
+
+      const result = solveFocalSimple(values);
+      if (result.ok) {
+        renderFinancialTimeline(timelineContainer, result.timeline);
+        return;
+      }
+
+      const timeline = buildSimpleTimeline(values);
+      renderFinancialTimeline(timelineContainer, timeline);
+    }
+
+    function convertFocalRateType(nextType) {
+      if (!RATE_TYPES[nextType]) return;
+
+      const previousType = state.focalRateType;
+      state.focalRateType = nextType;
+      if (!previousType || previousType === nextType) return;
+
+      const current = parseNumber(focalRateInput.dataset.preciseValue ?? focalRateInput.value);
+      if (!Number.isFinite(current) || current <= 0) return;
+
+      const yearDays = getFocalYearDays();
+      const annual = toAnnualRate(current, previousType, yearDays);
+      const converted = fromAnnualRate(annual, nextType, yearDays);
+      setFocalFieldValue(converted);
+    }
+
+    function renderFocalMovementTable(result) {
+      const rows = result.movements.map((movement) => {
+        const original = movement.unknown
+          ? 'X'
+          : formatMoney(movement.amount);
+        const periods = formatNumber(Math.abs(movement.years), 6);
+        const direction =
+          movement.direction === 'futuro'
+            ? 'Capitalización'
+            : movement.direction === 'pasado'
+              ? 'Descuento'
+              : 'Sin traslado';
+
+        return [
+          MOVEMENT_TYPES[movement.type].label,
+          movement.dateLabel,
+          original,
+          direction,
+          `${formatNumber(Math.abs(movement.daysFromFocal), 2)} días = ${periods} años`,
+          formatMoney(movement.valueAtFocal),
+        ];
+      });
+
+      renderTable(
+        focalMovementTable,
+        ['Tipo', 'Fecha', 'Valor original', 'Traslado', 'Períodos', 'Valor en fecha focal'],
+        rows
+      );
+    }
+
+    function renderFocalResult(result) {
+      focalResultsTarget.textContent = result.result.label;
+      focalResultLabel.textContent = result.result.label;
+      focalResultValue.textContent = result.result.formatted;
+      focalResultNote.textContent = result.result.note ?? '';
+
+      focalSummaryA.textContent = formatMoney(result.summary.sideA);
+      focalSummaryB.textContent = formatMoney(result.summary.sideB);
+      focalSummaryDiff.textContent = formatMoney(result.summary.difference);
+      focalSummaryDate.textContent = result.timeline.focalLabel;
+
+      focalEquation.textContent = result.equation;
+      focalEquationValues.textContent = result.equationValues;
+
+      focalDevelopment.replaceChildren(
+        ...result.development.map((step) => {
+          const item = document.createElement('li');
+          item.textContent = step;
+          return item;
+        })
+      );
+
+      focalSteps.replaceChildren(
+        ...result.steps.map((step) => {
+          const item = document.createElement('li');
+          item.textContent = step;
+          if (step.startsWith('Resultado:')) {
+            item.className = 'font-semibold text-ink';
+          }
+          return item;
+        })
+      );
+
+      renderFocalMovementTable(result);
+
+      results.hidden = true;
+      focalResults.hidden = false;
+      resultsEmpty.hidden = true;
+      hideFocalStale();
+    }
+
+    function calculateFocal({ silent = false } = {}) {
+      const values = getFocalValues();
+      const result = solveFocalSimple(values);
+      clearFocalErrors();
+
+      if (!result.ok) {
+        showFocalErrors(result.errors);
+        if (state.hasCalculatedFocal) showFocalStale();
+        const timeline = buildSimpleTimeline(values);
+        renderFinancialTimeline(timelineContainer, timeline);
+        if (!silent) announce('No se pudo resolver. Revisá los datos.');
+        return false;
+      }
+
+      state.lastFocalResult = result;
+      state.hasCalculatedFocal = true;
+      updateFocalConversions();
+      renderFocalResult(result);
+      renderFinancialTimeline(timelineContainer, result.timeline);
+
+      if (!silent) {
+        setFocalStatus('Resultado actualizado.');
+        announce(`${result.result.label}: ${result.result.formatted}`);
+      }
+
+      return true;
+    }
+
+    function applyFocalSnapshot(snapshot, { calculateAfter = true } = {}) {
+      if (!snapshot) return;
+
+      state.focalSnapshot = snapshot;
+      exerciseHeading.textContent = snapshot.title;
+      exerciseStatement.textContent = snapshot.statement;
+      exerciseNote.textContent = snapshot.note ?? '';
+      exerciseNote.hidden = !snapshot.note;
+      syncExerciseSelect(snapshot.presetId);
+      setFocalFields(snapshot.focal);
+
+      if (calculateAfter) {
+        calculateFocal({ silent: true });
+      } else {
+        updateFocalLive();
+      }
+    }
+
+    function resetFocalExercise() {
+      if (!state.focalBaseline) return;
+      applyFocalSnapshot(state.focalBaseline);
+      setFocalStatus('Datos restablecidos.');
+      announce('Datos restablecidos al ejercicio original.');
+    }
+
+    function clearFocalExercise() {
+      focalRateInput.value = '';
+      delete focalRateInput.dataset.preciseValue;
+      focalDateInput.value = '';
+      focalRateTypeSelect.value = 'anual';
+      state.focalRateType = 'anual';
+      focalYearDaysInputs.forEach((input) => {
+        input.checked = input.value === '360';
+      });
+      renderFocalMovements([]);
+      state.lastFocalResult = null;
+      state.hasCalculatedFocal = false;
+      clearFocalErrors();
+      hideFocalStale();
+      updateFocalConversions();
+      renderFinancialTimeline(timelineContainer, { ok: false });
+      focalResults.hidden = true;
+      results.hidden = true;
+      resultsEmpty.hidden = false;
+      setFocalStatus('Formulario limpio.');
+      announce('Formulario limpio. Podés completar nuevos datos.');
+    }
+
+    function exportFocalCsv() {
+      const values = getFocalValues();
+      const valid = calculateFocal({ silent: true });
+      const result = state.lastFocalResult;
+
+      if (!valid || !result) {
+        setFocalStatus('Calculá el ejercicio antes de exportar.');
+        return;
+      }
+
+      const snapshot = state.focalSnapshot;
+      const headers = [
+        'Ejercicio',
+        'Enunciado',
+        'Fecha de exportación',
+        'Fecha focal',
+        'Tasa',
+        'Tipo de tasa',
+        'Base de días',
+        'Tipo de movimiento',
+        'Descripción',
+        'Fecha del movimiento',
+        'Valor original',
+        'Traslado',
+        'Días a la fecha focal',
+        'Años a la fecha focal',
+        'Valor en fecha focal',
+        'Ecuación de valor',
+        'Valores en fecha focal',
+        'Resultado',
+        'Procedimiento',
+      ];
+
+      const exportDate = new Intl.DateTimeFormat('es-AR', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      }).format(new Date());
+
+      const rows = result.movements.map((movement) => {
+        const direction =
+          movement.direction === 'futuro'
+            ? 'Capitalización'
+            : movement.direction === 'pasado'
+              ? 'Descuento'
+              : 'Sin traslado';
+
+        return [
+          snapshot?.title ?? exerciseHeading.textContent.trim(),
+          snapshot?.statement ?? exerciseStatement.textContent.trim(),
+          exportDate,
+          result.timeline.focalLabel,
+          formatPlainNumber(values.rate),
+          values.rateType,
+          String(values.yearDays),
+          MOVEMENT_TYPES[movement.type].label,
+          movement.description ?? '',
+          movement.dateLabel,
+          movement.unknown ? 'X' : formatPlainNumber(movement.amount),
+          direction,
+          formatPlainNumber(Math.abs(movement.daysFromFocal)),
+          formatPlainNumber(Math.abs(movement.years)),
+          formatPlainNumber(movement.valueAtFocal),
+          result.equation,
+          result.equationValues,
+          result.result.formatted,
+          result.steps.join(' | '),
+        ];
+      });
+
+      const csv = [
+        headers.map(csvEscape).join(';'),
+        ...rows.map((row) => row.map(csvEscape).join(';')),
+      ].join('\r\n');
+
+      const blob = new Blob([`\uFEFF${csv}`], {
+        type: 'text/csv;charset=utf-8;',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const fileBase = (snapshot?.title ?? 'fecha-focal')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      link.href = url;
+      link.download = `${fileBase || 'fecha-focal'}.csv`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setFocalStatus('Archivo CSV descargado.');
+      announce('Archivo CSV descargado.');
+    }
+
+    function addEmptyMovement() {
+      addMovementRow({
+        type: 'obligacion',
+        date: focalDateInput.value ?? '',
+      });
+      updateFocalLive();
+      showFocalStale();
     }
 
     function csvEscape(value) {
@@ -1320,6 +2280,73 @@ const fieldValue = (value, options) => {
     root.querySelector('[data-action="clear"]').addEventListener('click', clearExercise);
     root.querySelector('[data-action="export"]').addEventListener('click', exportCsv);
 
+    focalForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      calculateFocal();
+    });
+
+    focalForm.addEventListener('input', (event) => {
+      if (
+        event.target.matches('[data-focal-rate], [data-movement-amount]')
+      ) {
+        delete event.target.dataset.preciseValue;
+      }
+      if (event.target.matches('[data-focal-rate]')) {
+        clearFocalFieldError('rate');
+      }
+      if (event.target.matches('[data-focal-date]')) {
+        clearFocalFieldError('focalDate');
+      }
+      updateFocalLive();
+      showFocalStale();
+    });
+
+    focalForm.addEventListener('change', (event) => {
+      if (event.target.matches('[data-focal-rate-type]')) {
+        convertFocalRateType(event.target.value);
+        updateFocalLive();
+        showFocalStale();
+        return;
+      }
+
+      if (event.target.matches('[data-movement-unknown]')) {
+        if (event.target.checked) {
+          focalMovementsContainer
+            .querySelectorAll('[data-movement-unknown]')
+            .forEach((checkbox) => {
+              if (checkbox !== event.target) checkbox.checked = false;
+            });
+        }
+        updateFocalUnknownState();
+      }
+
+      updateFocalLive();
+      showFocalStale();
+    });
+
+    focalMovementsContainer.addEventListener('click', (event) => {
+      const removeButton = event.target.closest('[data-remove-movement]');
+      if (!removeButton) return;
+
+      const row = removeButton.closest('[data-movement]');
+      if (row) row.remove();
+      if (getFocalMovementRows().length === 0) addMovementRow({});
+      updateFocalLive();
+      showFocalStale();
+    });
+
+    addMovementButton.addEventListener('click', addEmptyMovement);
+
+    root
+      .querySelector('[data-focal-action="reset"]')
+      .addEventListener('click', resetFocalExercise);
+    root
+      .querySelector('[data-focal-action="clear"]')
+      .addEventListener('click', clearFocalExercise);
+    root
+      .querySelector('[data-focal-action="export"]')
+      .addEventListener('click', exportFocalCsv);
+
     chartTabs.forEach((tab) => {
       tab.addEventListener('click', () => setChartTab(tab.dataset.chartTab));
     });
@@ -1335,6 +2362,8 @@ const fieldValue = (value, options) => {
     const initialSnapshot = initialExercise
       ? snapshotFromExercise(initialExercise)
       : null;
+
+    setMode('normal');
 
     if (initialSnapshot) {
       state.baseline = initialSnapshot;
