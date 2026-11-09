@@ -20,6 +20,24 @@ export const simpleInterestExercises = [
     id: 'ejercicio-2',
     title: 'Ejercicio 2',
     statement:
+      '¿Qué tiempo habrá estado invertido un capital de $85.000 que produjo un interés de $35.700 a una tasa anual de 21%?',
+    target: 'n',
+    yearDays: 360,
+    currency: 'USD',
+    note: 'n = I ÷ (C · i) = 35.700 ÷ (85.000 × 0,21) = 2 años.',
+    data: {
+      I: 35700,
+      C: 85000,
+      i: 21,
+      n: null,
+      timeUnit: 'anios',
+      rateType: 'anual',
+    },
+  },
+  {
+    id: 'ejercicio-3',
+    title: 'Ejercicio 3',
+    statement:
       '¿En cuántos días un capital de $65.000 produce intereses de $7.000, si se invierte al 8,25% simple anual?',
     target: 'n',
     yearDays: 360,
@@ -34,8 +52,8 @@ export const simpleInterestExercises = [
     },
   },
   {
-    id: 'ejercicio-3',
-    title: 'Ejercicio 3',
+    id: 'ejercicio-4',
+    title: 'Ejercicio 4',
     statement:
       '¿En cuánto tiempo se duplica un capital que se invierte con un tipo de interés del 11,8% simple anual?',
     target: 'n',
@@ -52,8 +70,8 @@ export const simpleInterestExercises = [
     },
   },
   {
-    id: 'ejercicio-4',
-    title: 'Ejercicio 4',
+    id: 'ejercicio-5',
+    title: 'Ejercicio 5',
     statement:
       '¿Cuál es la tasa de interés simple anual, si un capital de $17.500 genera $750 de intereses en 65 días?',
     target: 'i',
@@ -69,8 +87,8 @@ export const simpleInterestExercises = [
     },
   },
   {
-    id: 'ejercicio-5',
-    title: 'Ejercicio 5',
+    id: 'ejercicio-6',
+    title: 'Ejercicio 6',
     statement:
       '¿Qué produce más intereses: invertir al 9,76% simple anual o al 2,44% trimestral?',
     target: 'I',
@@ -87,8 +105,8 @@ export const simpleInterestExercises = [
     },
   },
   {
-    id: 'ejercicio-6',
-    title: 'Ejercicio 6',
+    id: 'ejercicio-7',
+    title: 'Ejercicio 7',
     mode: 'normal',
     statement:
       'Encontrar el valor presente, al 6% de interés simple, de $1.500 con vencimiento en 9 meses.',
@@ -107,8 +125,8 @@ export const simpleInterestExercises = [
     },
   },
   {
-    id: 'ejercicio-7',
-    title: 'Ejercicio 7',
+    id: 'ejercicio-8',
+    title: 'Ejercicio 8',
     mode: 'focal',
     statement:
       'En la fecha, B debe $1.000 por un préstamo con vencimiento en 6 meses, contratado originalmente a 1 año y medio a la tasa de 4% y debe, además, $2.500 con vencimiento en 9 meses, sin intereses. Él desea pagar $2.000 de inmediato y liquidar el saldo mediante un pago único dentro de un año. Suponiendo un rendimiento de 5% y considerando la fecha focal dentro de un año, determinar el pago único mencionado.',
@@ -154,8 +172,8 @@ export const simpleInterestExercises = [
     },
   },
   {
-    id: 'ejercicio-8',
-    title: 'Ejercicio 8',
+    id: 'ejercicio-9',
+    title: 'Ejercicio 9',
     mode: 'focal',
     statement:
       '¿Cuánto deberá invertirse al 5,1% simple anual el 15 de febrero, para disponer de $7.000 el 9 de mayo, de $15.500 el 20 de junio, y de $10.000 el 23 de diciembre?',
@@ -196,6 +214,53 @@ export const simpleInterestExercises = [
           date: '2026-12-23',
           amount: 10000,
           description: 'Recepción del 23 de diciembre',
+        },
+      ],
+    },
+  },
+  {
+    id: 'ejercicio-10',
+    title: 'Ejercicio 10',
+    mode: 'focal',
+    statement:
+      'Adriana deposita $15.000 el 15 de diciembre y $10.000 el 11 de marzo, y retira $9.500 el 28 de enero. Valora todo al 9 de mayo con interés simple anual del 4%.',
+    yearDays: 360,
+    currency: 'USD',
+    note: 'Fecha focal: 09/05/2026. Base comercial de 360 días. Los depósitos y el retiro se trasladan a la fecha focal; el saldo resultante es el valor acumulado al 9 de mayo.',
+    focal: {
+      rate: 4,
+      rateType: 'anual',
+      yearDays: 360,
+      focalDate: '2026-05-09',
+      movements: [
+        {
+          id: 'e10-deposito-1',
+          type: 'inversion',
+          date: '2025-12-15',
+          amount: 15000,
+          description: 'Depósito del 15 de diciembre',
+        },
+        {
+          id: 'e10-retiro',
+          type: 'pago',
+          date: '2026-01-28',
+          amount: 9500,
+          description: 'Retiro del 28 de enero',
+        },
+        {
+          id: 'e10-deposito-2',
+          type: 'inversion',
+          date: '2026-03-11',
+          amount: 10000,
+          description: 'Depósito del 11 de marzo',
+        },
+        {
+          id: 'e10-saldo',
+          type: 'recepcion',
+          date: '2026-05-09',
+          amount: null,
+          unknown: true,
+          description: 'Valor acumulado al 9 de mayo',
         },
       ],
     },

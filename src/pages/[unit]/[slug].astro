@@ -1,6 +1,7 @@
 ---
 import Header from '../../components/Header.astro';
 import SimpleInterestCalculator from '../../components/SimpleInterestCalculator.astro';
+import CompoundInterestCalculator from '../../components/CompoundInterestCalculator.astro';
 import '../../styles/global.css';
 import { units } from '../../data/catalog.js';
 import { topicContent } from '../../data/topics.js';
@@ -407,10 +408,12 @@ const curveEndY = isCompoundInterest ? 32 : 48;
                 aria-labelledby="tab-ejercicios"
                 data-tab-panel="ejercicios"
                 hidden
-                class="lg:col-span-3"
+                class="min-w-0 lg:col-span-3"
               >
                 {isSimpleInterest ? (
                   <SimpleInterestCalculator />
+                ) : isCompoundInterest ? (
+                  <CompoundInterestCalculator />
                 ) : (
                   <section
                     class="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-16 text-center sm:px-10"

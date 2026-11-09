@@ -1,3 +1,65 @@
 export const compoundInterestExercises = [
-  
+  {
+    id: 'ejercicio-1',
+    title: 'Ejercicio 1',
+    mode: 'normal',
+    statement:
+      '¿Qué capital debe invertir en una cuenta que paga el 13,6% anual capitalizable por mes, para disponer de $13.000 en 7 meses?',
+    note: 'Tasa nominal anual capitalizable mensualmente: i = 0,136 ÷ 12 por mes; n = 7 meses.',
+    target: 'C',
+    yearDays: 360,
+    currency: 'USD',
+    data: {
+      M: 13000,
+      C: null,
+      I: null,
+      i: 13.6,
+      n: 7,
+      rateBasis: 'nominal_anual',
+      frequency: 'mensual',
+      timeUnit: 'meses',
+    },
+  },
+  {
+    id: 'ejercicio-2',
+    title: 'Ejercicio 2',
+    mode: 'normal',
+    statement:
+      '¿Cuánto se acumula en una cuenta de ahorros que reditúa el 18,6% anual capitalizable por bimestre en un plazo de 2 años, si se invierten $35.000?',
+    note: 'Tasa nominal anual capitalizable por bimestre: m = 6; i = 0,186 ÷ 6 por bimestre; n = 2 años = 12 bimestres.',
+    target: 'M',
+    yearDays: 360,
+    currency: 'USD',
+    data: {
+      M: null,
+      C: 35000,
+      I: null,
+      i: 18.6,
+      n: 2,
+      rateBasis: 'nominal_anual',
+      frequency: 'bimestral',
+      timeUnit: 'anios',
+    },
+  },
+  {
+    id: 'ejercicio-3',
+    title: 'Ejercicio 3',
+    mode: 'normal',
+    statement:
+      '¿En cuánto tiempo se duplica un capital que se invierte al 11,2% anual compuesto por semana?',
+    note: 'Como el capital se duplica, se toma C = $1.000 y M = $2.000 (M = 2C). Tasa nominal anual capitalizable semanalmente: i = 0,112 ÷ 52 por semana. La respuesta es 322,1648 semanas (aproximadamente 6,20 años).',
+    target: 'n',
+    yearDays: 360,
+    currency: 'USD',
+    data: {
+      M: 2000,
+      C: 1000,
+      I: null,
+      i: 11.2,
+      n: null,
+      rateBasis: 'nominal_anual',
+      frequency: 'semanal',
+      timeUnit: 'semanas',
+    },
+  },
 ];

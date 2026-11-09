@@ -10,6 +10,7 @@
 
 export const TIME_UNITS = {
   dias: { label: 'días', singular: 'día' },
+  semanas: { label: 'semanas', singular: 'semana' },
   meses: { label: 'meses', singular: 'mes' },
   anios: { label: 'años', singular: 'año' },
 };
@@ -26,6 +27,12 @@ export const CAPITALIZATION = {
     periodLabel: 'semestres',
     periodSingular: 'semestre',
     perYear: () => 2,
+  },
+  bimestral: {
+    label: 'bimestral',
+    periodLabel: 'bimestres',
+    periodSingular: 'bimestre',
+    perYear: () => 6,
   },
   trimestral: {
     label: 'trimestral',
@@ -202,6 +209,7 @@ export function timeToPeriods(value, timeUnit, periodsPerYearValue, yearDays) {
   const base = normalizeYearDays(yearDays);
 
   if (timeUnit === 'dias') return (value * m) / base;
+  if (timeUnit === 'semanas') return (value * m) / 52;
   if (timeUnit === 'meses') return (value * m) / 12;
   return value * m;
 }
@@ -211,6 +219,7 @@ export function periodsToTime(periods, timeUnit, periodsPerYearValue, yearDays) 
   const base = normalizeYearDays(yearDays);
 
   if (timeUnit === 'dias') return (periods * base) / m;
+  if (timeUnit === 'semanas') return (periods * 52) / m;
   if (timeUnit === 'meses') return (periods * 12) / m;
   return periods / m;
 }
