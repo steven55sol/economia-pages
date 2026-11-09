@@ -34,7 +34,15 @@ const isSimpleInterest = card.slug === 'interes-simple';
 const isCompoundInterest = content?.illustration === 'compound';
 
 const conceptTitle = content ? `¿Qué es el ${card.title.toLowerCase()}?` : '';
-const formulaTitle = content ? `Fórmula del ${card.title.toLowerCase()}` : '';
+const formulaTitle = content
+  ? `${content.formulas ? 'Fórmulas' : 'Fórmula'} del ${card.title.toLowerCase()}`
+  : '';
+const formulas = content
+  ? (content.formulas ??
+    (content.formula
+      ? [{ title: 'Fórmula principal', ...content.formula }]
+      : []))
+  : [];
 
 const illustrationColors = {
   ochre: '#b7791f',
@@ -336,15 +344,26 @@ const curveEndY = isCompoundInterest ? 32 : 48;
                           {formulaTitle}
                         </h2>
 
-                        <p
-                          class="mt-6 font-display text-4xl italic tracking-[-0.02em] text-ink sm:text-5xl"
+                        <div
+                          class:list={[
+                            'mt-6 grid gap-4',
+                            formulas.length > 1 && 'sm:grid-cols-2',
+                          ]}
                         >
-                          {content.formula.expression}
-                        </p>
-
-                        <p class="mt-6 max-w-md text-sm leading-6 text-slate-600">
-                          {content.formula.note}
-                        </p>
+                          {formulas.map((item) => (
+                            <div class="rounded-xl border border-[#e7dcc6] bg-white/75 px-5 py-5">
+                              <p class="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                                {item.title}
+                              </p>
+                              <p class="mt-3 font-display text-2xl italic leading-tight tracking-[-0.01em] text-ink sm:text-3xl">
+                                {item.expression}
+                              </p>
+                              <p class="mt-3 text-sm leading-6 text-slate-600">
+                                {item.note}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </section>

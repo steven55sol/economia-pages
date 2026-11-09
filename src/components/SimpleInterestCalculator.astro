@@ -105,7 +105,7 @@ const fieldValue = (value, options) => {
     </p>
   </div>
 
-  <div class="mt-8 grid items-start gap-8 lg:grid-cols-2">
+  <div data-calculator-layout class="mt-8 grid items-start gap-8 lg:grid-cols-2">
     <div class="rounded-2xl border border-slate-200 bg-white">
       <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
         <h3 class="font-display text-2xl text-ink">Calculadora</h3>
@@ -410,13 +410,6 @@ const fieldValue = (value, options) => {
               Limpiar
             </button>
           </div>
-          <button
-            type="button"
-            data-action="export"
-            class="rounded-lg bg-[#8a5a12] px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#744c0f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a12] focus-visible:ring-offset-2"
-          >
-            Exportar Excel (CSV)
-          </button>
           <p data-action-status role="status" aria-live="polite" class="min-h-5 text-xs text-slate-500"></p>
         </div>
       </form>
@@ -515,7 +508,7 @@ const fieldValue = (value, options) => {
               + Agregar movimiento
             </button>
           </div>
-          <div data-focal-movements class="mt-3 space-y-3"></div>
+          <div data-focal-movements class="mt-3 grid gap-3 lg:grid-cols-2"></div>
           <p data-focal-error="movements" class="mt-1.5 hidden text-xs text-red-600"></p>
         </div>
 
@@ -573,13 +566,6 @@ const fieldValue = (value, options) => {
               Limpiar
             </button>
           </div>
-          <button
-            type="button"
-            data-focal-action="export"
-            class="rounded-lg bg-[#8a5a12] px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-[#744c0f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8a5a12] focus-visible:ring-offset-2"
-          >
-            Exportar Excel (CSV)
-          </button>
           <p data-focal-action-status role="status" aria-live="polite" class="min-h-5 text-xs text-slate-500"></p>
         </div>
       </form>
@@ -654,7 +640,7 @@ const fieldValue = (value, options) => {
       </template>
     </div>
 
-    <div class="lg:sticky lg:top-24">
+    <div data-calculator-side class="lg:sticky lg:top-24">
       <div data-chart-card class="rounded-2xl border border-slate-200 bg-white">
         <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
@@ -920,7 +906,6 @@ const fieldValue = (value, options) => {
     formatMoney,
     formatNumber,
     formatPercent,
-    formatPlainNumber,
     normalizeYearDays,
     parseNumber,
     solveExercise,
@@ -1016,6 +1001,8 @@ const fieldValue = (value, options) => {
 
     const normalPanel = root.querySelector('[data-normal-panel]');
     const focalPanel = root.querySelector('[data-focal-panel]');
+    const calculatorLayout = root.querySelector('[data-calculator-layout]');
+    const calculatorSide = root.querySelector('[data-calculator-side]');
     const chartCard = root.querySelector('[data-chart-card]');
     const timelineCard = root.querySelector('[data-timeline-card]');
     const timelineContainer = root.querySelector('[data-timeline]');
@@ -1630,6 +1617,17 @@ const fieldValue = (value, options) => {
       focalPanel.hidden = !focal;
       chartCard.hidden = focal;
       timelineCard.hidden = !focal;
+
+      // En fecha focal la calculadora y la línea de tiempo van una debajo de
+      // la otra, a ancho completo, para que la gráfica se vea entera.
+      if (calculatorLayout) {
+        calculatorLayout.classList.toggle('lg:grid-cols-2', !focal);
+      }
+      if (calculatorSide) {
+        calculatorSide.classList.toggle('lg:sticky', !focal);
+        calculatorSide.classList.toggle('lg:top-24', !focal);
+      }
+
       results.hidden = true;
       focalResults.hidden = true;
       resultsEmpty.hidden = focal
@@ -2029,102 +2027,6 @@ const fieldValue = (value, options) => {
       announce('Formulario limpio. Podés completar nuevos datos.');
     }
 
-    function exportFocalCsv() {
-      const values = getFocalValues();
-      const valid = calculateFocal({ silent: true });
-      const result = state.lastFocalResult;
-
-      if (!valid || !result) {
-        setFocalStatus('Calculá el ejercicio antes de exportar.');
-        return;
-      }
-
-      const snapshot = state.focalSnapshot;
-      const headers = [
-        'Ejercicio',
-        'Enunciado',
-        'Fecha de exportación',
-        'Fecha focal',
-        'Tasa',
-        'Tipo de tasa',
-        'Base de días',
-        'Tipo de movimiento',
-        'Descripción',
-        'Fecha del movimiento',
-        'Valor original',
-        'Traslado',
-        'Días a la fecha focal',
-        'Años a la fecha focal',
-        'Valor en fecha focal',
-        'Ecuación de valor',
-        'Valores en fecha focal',
-        'Resultado',
-        'Procedimiento',
-      ];
-
-      const exportDate = new Intl.DateTimeFormat('es-AR', {
-        dateStyle: 'short',
-        timeStyle: 'short',
-      }).format(new Date());
-
-      const rows = result.movements.map((movement) => {
-        const direction =
-          movement.direction === 'futuro'
-            ? 'Capitalización'
-            : movement.direction === 'pasado'
-              ? 'Descuento'
-              : 'Sin traslado';
-
-        return [
-          snapshot?.title ?? exerciseHeading.textContent.trim(),
-          snapshot?.statement ?? exerciseStatement.textContent.trim(),
-          exportDate,
-          result.timeline.focalLabel,
-          formatPlainNumber(values.rate),
-          values.rateType,
-          String(values.yearDays),
-          MOVEMENT_TYPES[movement.type].label,
-          movement.description ?? '',
-          movement.dateLabel,
-          movement.unknown ? 'X' : formatPlainNumber(movement.amount),
-          direction,
-          formatPlainNumber(Math.abs(movement.daysFromFocal)),
-          formatPlainNumber(Math.abs(movement.years)),
-          formatPlainNumber(movement.valueAtFocal),
-          result.equation,
-          result.equationValues,
-          result.result.formatted,
-          result.steps.join(' | '),
-        ];
-      });
-
-      const csv = [
-        headers.map(csvEscape).join(';'),
-        ...rows.map((row) => row.map(csvEscape).join(';')),
-      ].join('\r\n');
-
-      const blob = new Blob([`\uFEFF${csv}`], {
-        type: 'text/csv;charset=utf-8;',
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const fileBase = (snapshot?.title ?? 'fecha-focal')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-
-      link.href = url;
-      link.download = `${fileBase || 'fecha-focal'}.csv`;
-      document.body.append(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setFocalStatus('Archivo CSV descargado.');
-      announce('Archivo CSV descargado.');
-    }
-
     function addEmptyMovement() {
       addMovementRow({
         type: 'obligacion',
@@ -2132,97 +2034,6 @@ const fieldValue = (value, options) => {
       });
       updateFocalLive();
       showFocalStale();
-    }
-
-    function csvEscape(value) {
-      return `"${String(value ?? '')
-        .replace(/\r?\n/g, ' ')
-        .replace(/"/g, '""')}"`;
-    }
-
-    function exportCsv() {
-      const valid = calculate({ silent: true });
-      if (!valid || !state.lastResult) {
-        setStatus('Calculá el ejercicio antes de exportar.');
-        return;
-      }
-
-      const result = state.lastResult;
-      const snapshot = state.currentSnapshot;
-      const headers = [
-        'Ejercicio',
-        'Enunciado',
-        'Fecha',
-        'Variable calculada',
-        'Interés',
-        'Capital',
-        'Tasa',
-        'Tipo de tasa',
-        'Tiempo',
-        'Unidad de tiempo',
-        'Base de días',
-        'Tasa anual decimal',
-        'Tiempo en años',
-        'Tiempo en días',
-        'Días calendario',
-        'Fórmula',
-        'Sustitución',
-        'Procedimiento',
-        'Resultado',
-        'Monto total',
-      ];
-
-      const values = [
-        snapshot?.title ?? exerciseHeading.textContent.trim(),
-        snapshot?.statement ?? exerciseStatement.textContent.trim(),
-        new Intl.DateTimeFormat('es-AR', {
-          dateStyle: 'short',
-          timeStyle: 'short',
-        }).format(new Date()),
-        result.result.label,
-        formatPlainNumber(result.summary.interest),
-        formatPlainNumber(result.summary.capital),
-        formatPlainNumber(result.values.i),
-        result.rateType,
-        formatPlainNumber(result.values.n),
-        result.timeUnit,
-        String(result.yearDays),
-        formatPlainNumber(result.conversions.iAnnual),
-        formatPlainNumber(result.conversions.nYears),
-        formatPlainNumber(result.conversions.nDays),
-        formatPlainNumber(result.conversions.nCalendarDays),
-        result.formula.expression,
-        result.formula.substitution,
-        result.steps.join(' | '),
-        result.result.formatted,
-        formatPlainNumber(result.summary.total),
-      ];
-
-      const csv = [
-        headers.map(csvEscape).join(';'),
-        values.map(csvEscape).join(';'),
-      ].join('\r\n');
-
-      const blob = new Blob([`\uFEFF${csv}`], {
-        type: 'text/csv;charset=utf-8;',
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const fileBase = (snapshot?.title ?? 'interes-simple')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
-
-      link.href = url;
-      link.download = `${fileBase || 'interes-simple'}.csv`;
-      document.body.append(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setStatus('Archivo CSV descargado.');
-      announce('Archivo CSV descargado.');
     }
 
     function setChartTab(name) {
@@ -2278,7 +2089,6 @@ const fieldValue = (value, options) => {
 
     root.querySelector('[data-action="reset"]').addEventListener('click', resetExercise);
     root.querySelector('[data-action="clear"]').addEventListener('click', clearExercise);
-    root.querySelector('[data-action="export"]').addEventListener('click', exportCsv);
 
     focalForm.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -2343,9 +2153,6 @@ const fieldValue = (value, options) => {
     root
       .querySelector('[data-focal-action="clear"]')
       .addEventListener('click', clearFocalExercise);
-    root
-      .querySelector('[data-focal-action="export"]')
-      .addEventListener('click', exportFocalCsv);
 
     chartTabs.forEach((tab) => {
       tab.addEventListener('click', () => setChartTab(tab.dataset.chartTab));

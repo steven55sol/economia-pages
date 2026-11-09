@@ -114,7 +114,7 @@ export const simpleInterestExercises = [
       'En la fecha, B debe $1.000 por un préstamo con vencimiento en 6 meses, contratado originalmente a 1 año y medio a la tasa de 4% y debe, además, $2.500 con vencimiento en 9 meses, sin intereses. Él desea pagar $2.000 de inmediato y liquidar el saldo mediante un pago único dentro de un año. Suponiendo un rendimiento de 5% y considerando la fecha focal dentro de un año, determinar el pago único mencionado.',
     yearDays: 360,
     currency: 'USD',
-    note: 'El préstamo original de $1.000 a 1 año al 4% vence a los 6 meses con $1.040. Fecha focal a 1 año (27/12/2026, 360 días desde el 01/01/2026).',
+    note: 'El préstamo original de $1.000 a 1 año y medio al 4% vence a los 6 meses con $1.060. Fecha focal a 1 año (27/12/2026, 360 días desde el 01/01/2026).',
     focal: {
       rate: 5,
       rateType: 'anual',

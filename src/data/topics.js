@@ -10,6 +10,33 @@ export const topicContent = {
       expression: 'I = C · i · n',
       note: 'El interés se calcula una sola vez sobre el capital inicial, sin reinvertir los intereses de períodos anteriores.',
     },
+    formulas: [
+      {
+        title: 'Interés',
+        expression: 'I = C · i · n',
+        note: 'Multiplicá el capital inicial por la tasa del período y por la cantidad de períodos.',
+      },
+      {
+        title: 'Monto final',
+        expression: 'M = C + I = C · (1 + i · n)',
+        note: 'El monto es el capital inicial más los intereses generados durante toda la operación.',
+      },
+      {
+        title: 'Capital inicial',
+        expression: 'C = I ÷ (i · n)',
+        note: 'Se despeja el capital cuando se conocen el interés, la tasa y el tiempo.',
+      },
+      {
+        title: 'Tasa de interés',
+        expression: 'i = I ÷ (C · n)',
+        note: 'La tasa queda expresada por período. Si el tiempo está en meses, la tasa también será mensual.',
+      },
+      {
+        title: 'Tiempo',
+        expression: 'n = I ÷ (C · i)',
+        note: 'El tiempo se obtiene en la misma unidad en la que está expresada la tasa de interés.',
+      },
+    ],
     symbols: [
       {
         symbol: 'I',
@@ -20,6 +47,11 @@ export const topicContent = {
         symbol: 'C',
         name: 'Capital inicial',
         description: 'El dinero que se invierte o se presta al comienzo de la operación.',
+      },
+      {
+        symbol: 'M',
+        name: 'Monto final',
+        description: 'El capital inicial más todos los intereses generados al final de la operación. También se escribe M = C + I.',
       },
       {
         symbol: 'i',
