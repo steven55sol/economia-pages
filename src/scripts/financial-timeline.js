@@ -236,7 +236,7 @@ export function renderFinancialTimeline(container, model) {
   `;
 
   const svg = `
-    <svg viewBox="0 0 ${width} ${height}" class="block h-auto w-full min-w-[680px]" role="img" aria-label="Línea de tiempo financiera con fecha focal ${focalLabel}">
+    <svg viewBox="0 0 ${width} ${height}" class="block h-auto w-full min-w-[170]" role="img" aria-label="Línea de tiempo financiera con fecha focal ${focalLabel}">
       <defs>
         <marker id="arrow-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="${COLORS.a}" />
