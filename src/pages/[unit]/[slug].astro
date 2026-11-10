@@ -2,6 +2,7 @@
 import Header from '../../components/Header.astro';
 import SimpleInterestCalculator from '../../components/SimpleInterestCalculator.astro';
 import CompoundInterestCalculator from '../../components/CompoundInterestCalculator.astro';
+import DiscountCalculator from '../../components/DiscountCalculator.astro';
 import '../../styles/global.css';
 import { units } from '../../data/catalog.js';
 import { topicContent } from '../../data/topics.js';
@@ -33,6 +34,7 @@ const dots = {
 
 const isSimpleInterest = card.slug === 'interes-simple';
 const isCompoundInterest = content?.illustration === 'compound';
+const isDiscount = content?.illustration === 'discount';
 
 const conceptTitle = content ? `¿Qué es el ${card.title.toLowerCase()}?` : '';
 const formulaTitle = content
@@ -231,7 +233,7 @@ const curveEndY = isCompoundInterest ? 32 : 48;
                 <g fill="#10231c" font-size="13">
                   <text x="42" y="196" text-anchor="end">C</text>
                   <text x="42" y={isCompoundInterest ? 38 : 52} text-anchor="end">
-                    {isCompoundInterest ? 'M' : 'C + I'}
+                    {isCompoundInterest || isDiscount ? 'M' : 'C + I'}
                   </text>
                 </g>
                 <text
@@ -414,6 +416,8 @@ const curveEndY = isCompoundInterest ? 32 : 48;
                   <SimpleInterestCalculator />
                 ) : isCompoundInterest ? (
                   <CompoundInterestCalculator />
+                ) : isDiscount ? (
+                  <DiscountCalculator />
                 ) : (
                   <section
                     class="rounded-2xl border border-dashed border-slate-300 bg-white/60 px-6 py-16 text-center sm:px-10"

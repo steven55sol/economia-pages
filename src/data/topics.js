@@ -17,14 +17,14 @@ export const topicContent = {
         note: 'Multiplicá el capital inicial por la tasa del período y por la cantidad de períodos.',
       },
       {
-        title: 'Monto final',
-        expression: 'M = C + I = C · (1 + i · n)',
-        note: 'El monto es el capital inicial más los intereses generados durante toda la operación.',
+        title: 'Capital',
+        expression: 'C = I ÷ (i · n)',
+        note: 'Se despeja del interés. Si se conoce el monto final, se usa C = M ÷ (1 + i · n).',
       },
       {
-        title: 'Capital inicial',
-        expression: 'C = I ÷ (i · n)',
-        note: 'Se despeja el capital cuando se conocen el interés, la tasa y el tiempo.',
+        title: 'Monto',
+        expression: 'M = C · (1 + i · n)',
+        note: 'El monto es el capital inicial más los intereses generados durante toda la operación.',
       },
       {
         title: 'Tasa de interés',
@@ -80,49 +80,29 @@ export const topicContent = {
     },
     formulas: [
       {
-        title: 'Monto final',
+        title: 'Monto o valor futuro',
         expression: 'M = C · (1 + i)ⁿ',
         note: 'El capital se multiplica por el factor de capitalización (1 + i) en cada uno de los n períodos.',
       },
       {
-        title: 'Monto con tasa nominal',
-        expression: 'M = C · (1 + j/m)^(m · t)',
-        note: 'Si la tasa es nominal anual (j) y capitaliza m veces por año, se usa la tasa del período j/m durante m · t períodos.',
-      },
-      {
         title: 'Capital inicial',
-        expression: 'C = M ÷ (1 + i)ⁿ = M · (1 + i)⁻ⁿ',
+        expression: 'C = M ÷ (1 + i)ⁿ',
         note: 'Es el valor presente: se descuenta el monto final n períodos hacia atrás.',
       },
       {
-        title: 'Interés compuesto',
-        expression: 'I = M − C = C · [(1 + i)ⁿ − 1]',
-        note: 'Es la diferencia entre el monto final y el capital inicial. También se obtiene multiplicando el capital por el factor de capitalización menos uno.',
-      },
-      {
-        title: 'Tasa de interés por período',
+        title: 'Tasa de interés',
         expression: 'i = (M ÷ C)^(1/n) − 1',
-        note: 'Se despeja la tasa del período a partir de la relación entre el monto final y el capital inicial.',
+        note: 'Se obtiene a partir de la relación entre el monto final y el capital inicial, para n períodos.',
       },
       {
-        title: 'Número de períodos',
+        title: 'Tiempo',
         expression: 'n = log(M ÷ C) ÷ log(1 + i)',
-        note: 'Se despeja la cantidad de períodos usando logaritmos. El resultado queda en la misma unidad que la tasa.',
+        note: 'Se despeja con logaritmos. El resultado queda en la misma unidad que la tasa.',
       },
       {
-        title: 'Tasa nominal anual',
-        expression: 'j = i · m',
-        note: 'La tasa nominal anual es la tasa del período multiplicada por la cantidad de capitalizaciones del año. No incluye el efecto de la capitalización.',
-      },
-      {
-        title: 'Tasa efectiva anual',
-        expression: 'TEA = (1 + i)^m − 1 = (1 + j/m)^m − 1',
-        note: 'Es la tasa que refleja el efecto real de capitalizar m veces por año.',
-      },
-      {
-        title: 'Tasa del período desde la TEA',
-        expression: 'i = (1 + TEA)^(1/m) − 1',
-        note: 'Convierte una tasa efectiva anual en la tasa equivalente de cada período de capitalización.',
+        title: 'Interés generado',
+        expression: 'I = M − C = C · [(1 + i)ⁿ − 1]',
+        note: 'Es la diferencia entre el monto final y el capital inicial, es decir, la ganancia acumulada.',
       },
     ],
     symbols: [
@@ -174,5 +154,75 @@ export const topicContent = {
     ],
     figureLabel: 'El monto crece de forma acelerada porque los intereses se capitalizan',
     illustration: 'compound',
+  },
+  'descuento-simple': {
+    lead: 'Adelantás el cobro de un documento y recibís menos que su valor nominal. Esa diferencia es el descuento.',
+    whatIs: [
+      'El descuento simple es la operación con la que se cobra antes del vencimiento un documento que representa una deuda futura, como un pagaré, una letra de cambio o una factura. Quien adelanta el dinero retiene una parte del importe: el descuento. Por eso, el valor que se recibe es menor que el valor nominal del documento.',
+      'El valor nominal (M o VN) es lo que el documento vale al vencimiento; el valor efectivo o valor actual (C) es el dinero que se cobra anticipadamente; y el descuento (D) es la diferencia entre ambos, D = M − C. Hay dos criterios: el descuento comercial, que se calcula sobre el valor nominal, y el descuento racional, que se calcula sobre el valor efectivo.',
+    ],
+    example:
+      'Un pagaré de $10.000 con vencimiento en 6 meses se descuenta al 12% anual. Con descuento comercial: D = 10.000 × 0,12 × 0,5 = $600 y el valor efectivo es $9.400. Con descuento racional: D = $566,04 y el valor actual es $9.433,96.',
+    formulas: [
+      {
+        title: 'Descuento',
+        expression: 'D = M · d · n',
+        note: 'Criterio comercial: se calcula sobre el valor nominal. También se define como D = M − C.',
+      },
+      {
+        title: 'Valor nominal',
+        expression: 'M = C ÷ (1 − d · n)',
+        note: 'Criterio comercial. En el criterio racional se usa M = C · (1 + i · n).',
+      },
+      {
+        title: 'Valor presente',
+        expression: 'C = M · (1 − d · n)',
+        note: 'Criterio comercial. En el criterio racional se usa C = M ÷ (1 + i · n).',
+      },
+      {
+        title: 'Tasa de descuento',
+        expression: 'd = D ÷ (M · n)',
+        note: 'Queda expresada en la misma unidad de tiempo que n. Si n está en meses, d es mensual.',
+      },
+      {
+        title: 'Tiempo',
+        expression: 'n = D ÷ (M · d)',
+        note: 'Es el tiempo que falta hasta el vencimiento. En el criterio racional se usa n = D ÷ (C · i).',
+      },
+    ],
+    symbols: [
+      {
+        symbol: 'D',
+        name: 'Descuento',
+        description: 'La diferencia entre el valor nominal y el valor efectivo: D = M − C. Es la retribución de quien adelanta el dinero.',
+      },
+      {
+        symbol: 'M',
+        name: 'Valor nominal',
+        description: 'El importe que el documento vale al vencimiento. También se escribe VN. Es la base del descuento comercial.',
+      },
+      {
+        symbol: 'C',
+        name: 'Valor efectivo o actual',
+        description: 'El dinero que se recibe al descontar el documento antes de su vencimiento. También se llama valor líquido o valor presente.',
+      },
+      {
+        symbol: 'd',
+        name: 'Tasa de descuento',
+        description: 'El porcentaje que se aplica al valor nominal en cada período para calcular el descuento comercial. Por ejemplo, 12% = 0,12.',
+      },
+      {
+        symbol: 'i',
+        name: 'Tasa de interés',
+        description: 'La tasa que se aplica sobre el valor efectivo en el descuento racional. Representa la rentabilidad de quien adelanta el dinero.',
+      },
+      {
+        symbol: 'n',
+        name: 'Tiempo',
+        description: 'El tiempo que falta hasta el vencimiento, expresado en la misma unidad que la tasa. Para días se usa base 360 o 365.',
+      },
+    ],
+    figureLabel: 'El valor efectivo es menor que el valor nominal; la diferencia es el descuento',
+    illustration: 'discount',
   },
 };
